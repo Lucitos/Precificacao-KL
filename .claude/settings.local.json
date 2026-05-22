@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -m ensurepip --upgrade)",
+      "Bash(python3 -m pip install pandas openpyxl --break-system-packages --quiet)",
+      "Bash(fish -c \"which pip || which pip3 || which uv || which conda || which mamba\")",
+      "Bash(pacman -Q python-pandas)",
+      "Bash(pacman -Q python-openpyxl)",
+      "Bash(pacman -Qs python)",
+      "Bash(fish -c \"uv pip install pandas openpyxl 2>&1\")",
+      "Bash(uv pip *)",
+      "Bash(sudo pacman -S python-pandas python-openpyxl --noconfirm)",
+      "Bash(python3 *)",
+      "Bash(npx tsx *)",
+      "Bash(xargs ls)",
+      "Bash(npx tsc *)",
+      "Bash(npx shadcn@latest add dropdown-menu --yes)",
+      "Bash(npx prisma *)",
+      "Bash(npm run *)",
+      "Read(//tmp/**)",
+      "Bash(kill 45935)",
+      "Bash(curl *)"
+    ]
+  }
+}

@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role      @default(ORCAMENTISTA)
+  projetos  Projeto[]
+  criadoEm DateTime  @default(now())
+}
+
+enum Role {
+  ADMIN
+  ORCAMENTISTA
+}
+
+model DREParametros {
+  id                  String   @id @default(cuid())
+  exercicio           String
+  pctCustoFixo        Decimal  @db.Decimal(12, 10)
+  pctCustoVariavel    Decimal  @db.Decimal(12, 10)
+  pctSalarios         Decimal  @db.Decimal(12, 10)
+  faturamentoEstimado Decimal? @db.Decimal(16, 2)
+  ativo               Boolean  @default(false)
+  criadoEm           DateTime @default(now())
+}
+
+model Componente {
+  id               String            @id @default(cuid())
+  codigoFabricante String            @unique
+  descricao        String
+  fabricante       String?
+  categoria        String?
+  unidadeMedida    String            @default("Unidade")
+  ativo            Boolean           @default(true)
+  precos           PrecoComponente[]
+  itens            ItemOrcamento[]
+  criadoEm        DateTime          @default(now())
+}
+
+model PrecoComponente {
+  id           String     @id @default(cuid())
+  componente   Componente @relation(fields: [componenteId], references: [id])
+  componenteId String
+  precoCusto   Decimal    @db.Decimal(14, 4)
+  vigenteDe    DateTime   @default(now())
+  vigenteAte   DateTime?
+  criadoEm    DateTime   @default(now())
+}
+
+model Projeto {
+  id               String          @id @default(cuid())
+  numeroReferencia String          @unique
+  nome             String
+  cliente          String
+  descricao        String?
+  status           StatusProjeto   @default(RASCUNHO)
+  margemAplicada   Decimal         @db.Decimal(6, 4)
+  markupAplicado   Decimal         @db.Decimal(12, 8)
+  custoDiretoTotal Decimal         @db.Decimal(16, 2)
+  precoVendaTotal  Decimal         @db.Decimal(16, 2)
+  vi               Decimal         @db.Decimal(8, 4)
+  dreSnapshot      Json
+  desconto         Decimal?        @db.Decimal(6, 2)
+  responsavel      User            @relation(fields: [responsavelId], references: [id])
+  responsavelId    String
+  itens            ItemOrcamento[]
+  quadros          Quadro[]
+  criadoEm        DateTime        @default(now())
+  atualizadoEm    DateTime        @updatedAt
+  emitidoEm       DateTime?
+}
+
+model Quadro {
+  id        String          @id @default(cuid())
+  projeto   Projeto         @relation(fields: [projetoId], references: [id], onDelete: Cascade)
+  projetoId String
+  nome      String
+  quantidade Int            @default(1)
+  ordem     Int             @default(0)
+  itens     ItemOrcamento[]
+  criadoEm  DateTime        @default(now())
+}
+
+enum StatusProjeto {
+  RASCUNHO
+  EMITIDO
+  CANCELADO
+}
+
+model ItemOrcamento {
+  id                 String     @id @default(cuid())
+  projeto            Projeto    @relation(fields: [projetoId], references: [id], onDelete: Cascade)
+  projetoId          String
+  quadro             Quadro?    @relation(fields: [quadroId], references: [id], onDelete: SetNull)
+  quadroId           String?
+  componente         Componente @relation(fields: [componenteId], references: [id])
+  componenteId       String
+  quantidade         Decimal    @db.Decimal(12, 4)
+  precoCustoUnitario Decimal    @db.Decimal(14, 4)
+  precoCustoTotal    Decimal    @db.Decimal(16, 2)
+  observacao         String?
+}
