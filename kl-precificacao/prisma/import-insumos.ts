@@ -3,11 +3,9 @@ dotenv.config({ path: ".env.local" })
 dotenv.config()
 
 import { PrismaClient } from "@prisma/client"
-import { PrismaPg } from "@prisma/adapter-pg"
-import { Pool } from "pg"
+import { PrismaNeon } from "@prisma/adapter-neon"
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL })
-const adapter = new PrismaPg(pool)
+const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! })
 const prisma = new PrismaClient({ adapter })
 
 const insumos = [
@@ -1451,4 +1449,4 @@ async function main() {
 
 main()
   .catch((e) => { console.error(e); process.exit(1) })
-  .finally(async () => { await prisma.$disconnect(); await pool.end() })
+  .finally(async () => { await prisma.$disconnect() })
