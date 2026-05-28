@@ -10,9 +10,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
+import Image from "next/image"
 import {
-  ArrowLeft, Search, Plus, Trash2, CheckCircle,
-  AlertTriangle, XCircle, Zap, Loader2, Save, LayoutGrid,
+  ArrowLeft, Search, Plus, Trash2,
+  Loader2, Save, LayoutGrid, CheckCircle,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -213,18 +214,6 @@ export default function EditarProjetoForm({
         pctSalarios: dre.pctSalarios,
       })
     : null
-
-  const viColor =
-    !resultado ? "text-slate-400"
-    : resultado.viStatus === "verde" ? "text-green-600"
-    : resultado.viStatus === "amarelo" ? "text-amber-500"
-    : "text-red-600"
-
-  const viIcon =
-    !resultado ? null
-    : resultado.viStatus === "verde" ? <CheckCircle className="w-5 h-5 text-green-600" />
-    : resultado.viStatus === "amarelo" ? <AlertTriangle className="w-5 h-5 text-amber-500" />
-    : <XCircle className="w-5 h-5 text-red-600" />
 
   const handleSalvar = async (emitir: boolean) => {
     if (!nome || !cliente) { toast.error("Preencha nome e cliente."); return }
@@ -497,8 +486,8 @@ export default function EditarProjetoForm({
         <div className="w-72 flex-shrink-0">
           <Card className="border-0 shadow-sm bg-[#0f2744] text-white sticky top-6">
             <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#f59e0b]" fill="currentColor" />
+              <div className="flex items-center gap-2.5">
+                <Image src="/kl-logo.png" alt="KL" width={26} height={26} className="rounded-lg flex-shrink-0" />
                 <CardTitle className="text-sm text-white font-semibold">Precificação</CardTitle>
               </div>
               <p className="text-xs text-blue-200/60 mt-0.5">Margem: {margem}%</p>
@@ -533,13 +522,6 @@ export default function EditarProjetoForm({
                   <div className="flex justify-between py-1.5 border-t border-white/10">
                     <span className="text-blue-200/60 text-xs">Markup</span>
                     <span className="font-semibold text-xs">{Number(resultado.markup).toFixed(4)}×</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2 bg-white/5 rounded-xl px-3 mt-2">
-                    <span className="text-xs font-semibold">Indicador VI</span>
-                    <div className="flex items-center gap-1.5">
-                      {viIcon}
-                      <span className={`font-bold text-base ${viColor}`}>{Number(resultado.vi).toFixed(2)}</span>
-                    </div>
                   </div>
                 </>
               )}

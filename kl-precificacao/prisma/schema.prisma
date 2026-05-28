@@ -76,6 +76,7 @@ model Projeto {
   criadoEm        DateTime        @default(now())
   atualizadoEm    DateTime        @updatedAt
   emitidoEm       DateTime?
+  vendidoEm       DateTime?
 }
 
 model Quadro {
@@ -92,6 +93,7 @@ model Quadro {
 enum StatusProjeto {
   RASCUNHO
   EMITIDO
+  VENDIDO
   CANCELADO
 }
 

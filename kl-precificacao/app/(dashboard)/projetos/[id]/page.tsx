@@ -7,21 +7,24 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { formatBRL, formatPercent } from "@/lib/markup"
-import { cancelarProjeto, duplicarProjeto } from "@/actions/projetos"
+import { cancelarProjeto, duplicarProjeto, emitirProjeto, marcarVendido } from "@/actions/projetos"
+import Image from "next/image"
 import Link from "next/link"
 import {
-  ArrowLeft, CheckCircle, AlertTriangle, XCircle, Copy, Trash2,
-  Pencil, LayoutGrid, Tag,
+  ArrowLeft, Copy, Trash2,
+  Pencil, LayoutGrid, Tag, SendHorizonal, ShoppingCart,
 } from "lucide-react"
 
 const STATUS_LABELS: Record<string, string> = {
   RASCUNHO: "Rascunho",
   EMITIDO: "Emitido",
+  VENDIDO: "Vendido",
   CANCELADO: "Cancelado",
 }
 const STATUS_COLORS: Record<string, string> = {
   RASCUNHO: "bg-slate-100 text-slate-600 border-slate-200",
-  EMITIDO: "bg-blue-100 text-blue-700 border-blue-200",
+  EMITIDO: "bg-green-100 text-green-700 border-green-200",
+  VENDIDO: "bg-blue-100 text-blue-700 border-blue-200",
   CANCELADO: "bg-red-100 text-red-700 border-red-200",
 }
 
@@ -60,17 +63,6 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
     pctSalarios: string
     faturamentoEstimado?: string
   }
-
-  const vi = Number(projeto.vi)
-  const viStatus = vi >= 1.1 ? "verde" : vi >= 0.95 ? "amarelo" : "vermelho"
-  const viIcon =
-    viStatus === "verde" ? <CheckCircle className="w-5 h-5 text-green-600" />
-    : viStatus === "amarelo" ? <AlertTriangle className="w-5 h-5 text-amber-500" />
-    : <XCircle className="w-5 h-5 text-red-600" />
-  const viColor =
-    viStatus === "verde" ? "text-green-600"
-    : viStatus === "amarelo" ? "text-amber-500"
-    : "text-red-600"
 
   const totalItens =
     projeto.quadros.reduce((acc, q) => acc + q.itens.length, 0) + projeto.itens.length
@@ -126,6 +118,20 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
                 <Copy className="w-3.5 h-3.5" /> Duplicar
               </Button>
             </form>
+            {projeto.status === "RASCUNHO" && (
+              <form action={async () => { "use server"; await emitirProjeto(projeto.id) }}>
+                <Button type="submit" size="sm" className="gap-1.5 h-9 bg-green-600 hover:bg-green-700 text-white border-0">
+                  <SendHorizonal className="w-3.5 h-3.5" /> Emitir
+                </Button>
+              </form>
+            )}
+            {projeto.status === "EMITIDO" && (
+              <form action={async () => { "use server"; await marcarVendido(projeto.id) }}>
+                <Button type="submit" size="sm" className="gap-1.5 h-9 bg-blue-600 hover:bg-blue-700 text-white border-0">
+                  <ShoppingCart className="w-3.5 h-3.5" /> Marcar Vendido
+                </Button>
+              </form>
+            )}
             {isAdmin && projeto.status !== "CANCELADO" && (
               <form action={async () => { "use server"; await cancelarProjeto(projeto.id) }}>
                 <Button type="submit" variant="outline" size="sm" className="gap-1.5 h-9 border-red-200 text-red-600 hover:bg-red-50">
@@ -305,13 +311,6 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
               <div className="flex justify-between text-xs">
                 <span className="text-blue-200/60">Markup</span>
                 <span>{Number(projeto.markupAplicado).toFixed(4)}×</span>
-              </div>
-              <div className="flex items-center justify-between bg-white/5 rounded-xl px-3 py-3 mt-2">
-                <span className="text-xs font-semibold">Indicador VI</span>
-                <div className="flex items-center gap-1.5">
-                  {viIcon}
-                  <span className={`font-bold text-xl ${viColor}`}>{vi.toFixed(2)}</span>
-                </div>
               </div>
             </CardContent>
           </Card>

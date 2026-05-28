@@ -20,9 +20,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { aplicarDesconto } from "@/actions/projetos"
+import { aplicarDesconto, emitirProjeto, marcarVendido } from "@/actions/projetos"
 import { formatBRL } from "@/lib/markup"
-import { MoreHorizontal, ExternalLink, Pencil, FileText, Tag, Loader2 } from "lucide-react"
+import { MoreHorizontal, ExternalLink, Pencil, FileText, Tag, Loader2, SendHorizonal, ShoppingCart } from "lucide-react"
 
 interface Props {
   id: string
@@ -36,8 +36,8 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
   const [discountOpen, setDiscountOpen] = useState(false)
   const [pct, setPct] = useState("")
   const [saving, setSaving] = useState(false)
+  const [loadingAction, setLoadingAction] = useState<string | null>(null)
 
-  // Sync input when dialog opens
   useEffect(() => {
     if (discountOpen) {
       setPct(desconto !== null ? String(desconto) : "")
@@ -75,6 +75,32 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
     }
   }
 
+  const handleEmitir = async () => {
+    setLoadingAction("emitir")
+    try {
+      const result = await emitirProjeto(id)
+      if (result?.error) toast.error(result.error)
+      else { toast.success("Projeto emitido!"); router.refresh() }
+    } catch {
+      toast.error("Erro ao emitir projeto.")
+    } finally {
+      setLoadingAction(null)
+    }
+  }
+
+  const handleVendido = async () => {
+    setLoadingAction("vendido")
+    try {
+      const result = await marcarVendido(id)
+      if (result?.error) toast.error(result.error)
+      else { toast.success("Projeto marcado como vendido!"); router.refresh() }
+    } catch {
+      toast.error("Erro ao marcar como vendido.")
+    } finally {
+      setLoadingAction(null)
+    }
+  }
+
   return (
     <>
       <DropdownMenu>
@@ -87,7 +113,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
             <MoreHorizontal className="w-4 h-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuContent align="end" className="w-52">
           <DropdownMenuItem onClick={() => router.push(`/projetos/${id}`)}>
             <ExternalLink className="w-4 h-4 mr-2" />
             Ver detalhes
@@ -100,6 +126,32 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
 
           <DropdownMenuSeparator />
 
+          {status === "RASCUNHO" && (
+            <DropdownMenuItem
+              onClick={handleEmitir}
+              disabled={loadingAction === "emitir"}
+              className="text-green-700 focus:text-green-700"
+            >
+              {loadingAction === "emitir"
+                ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                : <SendHorizonal className="w-4 h-4 mr-2" />}
+              Emitir Projeto
+            </DropdownMenuItem>
+          )}
+
+          {status === "EMITIDO" && (
+            <DropdownMenuItem
+              onClick={handleVendido}
+              disabled={loadingAction === "vendido"}
+              className="text-blue-700 focus:text-blue-700"
+            >
+              {loadingAction === "vendido"
+                ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                : <ShoppingCart className="w-4 h-4 mr-2" />}
+              Marcar como Vendido
+            </DropdownMenuItem>
+          )}
+
           <DropdownMenuItem
             onClick={() => toast.info("Geração de relatório em breve.")}
             className="text-slate-600"
@@ -108,8 +160,6 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
             Gerar Relatório PDF
           </DropdownMenuItem>
 
-          {/* onSelect preventDefault prevents Radix from restoring focus to trigger,
-              which would block the Dialog from opening/working properly */}
           <DropdownMenuItem
             onSelect={(e) => e.preventDefault()}
             onClick={() => setDiscountOpen(true)}

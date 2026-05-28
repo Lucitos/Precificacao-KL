@@ -63,7 +63,7 @@ export async function criarProjeto(
         nome,
         cliente,
         descricao: descricao || null,
-        status: "EMITIDO",
+        status: "RASCUNHO",
         margemAplicada: margemDecimal.toString(),
         markupAplicado: resultado.markup,
         custoDiretoTotal: resultado.custoDireto,
@@ -71,7 +71,6 @@ export async function criarProjeto(
         vi: resultado.vi,
         dreSnapshot,
         responsavelId: session.userId,
-        emitidoEm: new Date(),
       },
     })
 
@@ -207,6 +206,44 @@ export async function cancelarProjeto(id: string) {
   await prisma.projeto.update({ where: { id }, data: { status: "CANCELADO" } })
   revalidatePath("/projetos")
   revalidatePath(`/projetos/${id}`)
+  return { success: true }
+}
+
+export async function emitirProjeto(id: string) {
+  const session = await getSession()
+  if (!session) return { error: "Não autenticado." }
+
+  const projeto = await prisma.projeto.findUnique({ where: { id } })
+  if (!projeto) return { error: "Projeto não encontrado." }
+  if (projeto.status !== "RASCUNHO") return { error: "Apenas rascunhos podem ser emitidos." }
+
+  await prisma.projeto.update({
+    where: { id },
+    data: { status: "EMITIDO", emitidoEm: new Date() },
+  })
+
+  revalidatePath("/projetos")
+  revalidatePath(`/projetos/${id}`)
+  revalidatePath("/")
+  return { success: true }
+}
+
+export async function marcarVendido(id: string) {
+  const session = await getSession()
+  if (!session) return { error: "Não autenticado." }
+
+  const projeto = await prisma.projeto.findUnique({ where: { id } })
+  if (!projeto) return { error: "Projeto não encontrado." }
+  if (projeto.status !== "EMITIDO") return { error: "Apenas projetos emitidos podem ser marcados como vendidos." }
+
+  await prisma.projeto.update({
+    where: { id },
+    data: { status: "VENDIDO", vendidoEm: new Date() },
+  })
+
+  revalidatePath("/projetos")
+  revalidatePath(`/projetos/${id}`)
+  revalidatePath("/")
   return { success: true }
 }
 

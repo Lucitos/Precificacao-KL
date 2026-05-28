@@ -11,9 +11,10 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
+import Image from "next/image"
 import {
   ArrowLeft, ArrowRight, Search, Plus, Trash2, CheckCircle,
-  AlertTriangle, XCircle, Zap, Loader2, LayoutGrid,
+  Loader2, LayoutGrid, Save,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -209,18 +210,6 @@ export default function NovoProjetoPage() {
       })
     : null
 
-  const viColor =
-    !resultado ? "text-slate-400"
-    : resultado.viStatus === "verde" ? "text-green-600"
-    : resultado.viStatus === "amarelo" ? "text-amber-500"
-    : "text-red-600"
-
-  const viIcon =
-    !resultado ? null
-    : resultado.viStatus === "verde" ? <CheckCircle className="w-5 h-5 text-green-600" />
-    : resultado.viStatus === "amarelo" ? <AlertTriangle className="w-5 h-5 text-amber-500" />
-    : <XCircle className="w-5 h-5 text-red-600" />
-
   const handleSubmit = async () => {
     setLoading(true)
     try {
@@ -240,7 +229,7 @@ export default function NovoProjetoPage() {
       if (result?.error) {
         toast.error(result.error)
       } else {
-        toast.success("Projeto criado com sucesso!")
+        toast.success("Rascunho salvo com sucesso!")
         router.push(`/projetos/${result.id}`)
       }
     } finally {
@@ -525,8 +514,8 @@ export default function NovoProjetoPage() {
           <div className="w-72 flex-shrink-0 space-y-4">
             <Card className="border-0 shadow-sm bg-[#0f2744] text-white sticky top-6">
               <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-[#f59e0b]" fill="currentColor" />
+                <div className="flex items-center gap-2.5">
+                  <Image src="/kl-logo.png" alt="KL" width={26} height={26} className="rounded-lg flex-shrink-0" />
                   <CardTitle className="text-sm text-white font-semibold">Precificação</CardTitle>
                 </div>
                 <p className="text-xs text-blue-200/60 mt-0.5">Margem: {margem}%</p>
@@ -562,14 +551,7 @@ export default function NovoProjetoPage() {
                       <span className="text-blue-200/60 text-xs">Markup</span>
                       <span className="font-semibold text-xs">{Number(resultado.markup).toFixed(4)}×</span>
                     </div>
-                    <div className="flex items-center justify-between py-2 bg-white/5 rounded-xl px-3 mt-2">
-                      <span className="text-xs font-semibold">Indicador VI</span>
-                      <div className="flex items-center gap-1.5">
-                        {viIcon}
-                        <span className={`font-bold text-base ${viColor}`}>{Number(resultado.vi).toFixed(2)}</span>
-                      </div>
-                    </div>
-                  </>
+                    </>
                 )}
                 {!dre && (
                   <p className="text-xs text-red-300 text-center py-2">Nenhum DRE ativo. Configure em Parâmetros DRE.</p>
@@ -648,13 +630,6 @@ export default function NovoProjetoPage() {
                   <span>Markup aplicado</span>
                   <span>{Number(resultado.markup).toFixed(4)}×</span>
                 </div>
-                <div className="flex items-center justify-between bg-[#f0f4f8] rounded-xl px-4 py-3 mt-2">
-                  <span className="text-sm font-semibold text-[#0f2744]">Indicador de Viabilidade (VI)</span>
-                  <div className="flex items-center gap-2">
-                    {viIcon}
-                    <span className={`font-bold text-xl ${viColor}`}>{Number(resultado.vi).toFixed(2)}</span>
-                  </div>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -671,7 +646,7 @@ export default function NovoProjetoPage() {
               {loading ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</>
               ) : (
-                <><CheckCircle className="w-4 h-4" /> Emitir Projeto</>
+                <><Save className="w-4 h-4" /> Salvar como Rascunho</>
               )}
             </Button>
           </div>
