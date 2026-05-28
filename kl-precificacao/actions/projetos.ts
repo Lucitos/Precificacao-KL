@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/db"
+import { Prisma } from "@prisma/client"
 import { getSession } from "@/lib/session"
 import { calcularPrecificacao } from "@/lib/markup"
 import { gerarNumeroReferencia } from "@/lib/utils"
@@ -56,7 +57,7 @@ export async function criarProjeto(
     faturamentoEstimado: dre.faturamentoEstimado?.toString() ?? null,
   }
 
-  const projeto = await prisma.$transaction(async (tx) => {
+  const projeto = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const p = await tx.projeto.create({
       data: {
         numeroReferencia,
@@ -139,7 +140,7 @@ export async function atualizarProjeto(
     faturamentoEstimado: dre.faturamentoEstimado?.toString() ?? null,
   }
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.itemOrcamento.deleteMany({ where: { projetoId: id } })
     await tx.quadro.deleteMany({ where: { projetoId: id } })
 
@@ -265,7 +266,7 @@ export async function duplicarProjeto(id: string) {
   const count = await prisma.projeto.count()
   const numeroReferencia = gerarNumeroReferencia(count)
 
-  const novo = await prisma.$transaction(async (tx) => {
+  const novo = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const p = await tx.projeto.create({
       data: {
         numeroReferencia,
