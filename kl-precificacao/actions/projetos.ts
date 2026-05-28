@@ -2,10 +2,11 @@
 
 import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/db"
-import { Prisma } from "@prisma/client"
 import { getSession } from "@/lib/session"
 import { calcularPrecificacao } from "@/lib/markup"
 import { gerarNumeroReferencia } from "@/lib/utils"
+
+type TransactionClient = Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
 
 export interface ItemInput {
   componenteId: string
@@ -57,7 +58,7 @@ export async function criarProjeto(
     faturamentoEstimado: dre.faturamentoEstimado?.toString() ?? null,
   }
 
-  const projeto = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  const projeto = await prisma.$transaction(async (tx: TransactionClient) => {
     const p = await tx.projeto.create({
       data: {
         numeroReferencia,
@@ -140,7 +141,7 @@ export async function atualizarProjeto(
     faturamentoEstimado: dre.faturamentoEstimado?.toString() ?? null,
   }
 
-  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  await prisma.$transaction(async (tx: TransactionClient) => {
     await tx.itemOrcamento.deleteMany({ where: { projetoId: id } })
     await tx.quadro.deleteMany({ where: { projetoId: id } })
 
@@ -266,7 +267,7 @@ export async function duplicarProjeto(id: string) {
   const count = await prisma.projeto.count()
   const numeroReferencia = gerarNumeroReferencia(count)
 
-  const novo = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  const novo = await prisma.$transaction(async (tx: TransactionClient) => {
     const p = await tx.projeto.create({
       data: {
         numeroReferencia,
