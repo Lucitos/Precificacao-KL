@@ -7,6 +7,12 @@ import { calcularPrecificacao } from "@/lib/markup"
 import { gerarNumeroReferencia } from "@/lib/utils"
 
 type TransactionClient = Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
+type ItemIncluded = {
+  componenteId: string
+  precoCustoUnitario: { toString(): string }
+  quantidade: { toString(): string }
+  componente: { precos: Array<{ precoCusto: { toString(): string } }> }
+}
 
 export interface ItemInput {
   componenteId: string
@@ -291,7 +297,7 @@ export async function duplicarProjeto(id: string) {
       })
       if (q.itens.length > 0) {
         await tx.itemOrcamento.createMany({
-          data: q.itens.map((item) => {
+          data: q.itens.map((item: ItemIncluded) => {
             const precoAtual = item.componente.precos[0]?.precoCusto ?? item.precoCustoUnitario
             return {
               projetoId: p.id,
