@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { formatBRL, formatPercent } from "@/lib/markup"
 import { cancelarProjeto, duplicarProjeto, emitirProjeto, marcarVendido } from "@/actions/projetos"
+import DeleteProjetoButton from "@/components/projetos/DeleteProjetoButton"
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -138,6 +139,9 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
                   <Trash2 className="w-3.5 h-3.5" /> Cancelar
                 </Button>
               </form>
+            )}
+            {isAdmin && (
+              <DeleteProjetoButton id={projeto.id} nome={projeto.nome} />
             )}
           </div>
         }
