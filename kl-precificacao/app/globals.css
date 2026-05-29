@@ -32,6 +32,33 @@
   --radius: 0.5rem;
 }
 
+.dark {
+  color-scheme: dark;
+  /* Neutros invertidos (tom tinta-teal, não cinza puro) */
+  --paper: #0D1A1F;
+  --surface: #122128;            /* superfície elevada sobre o papel */
+  --surface-2: #16272F;
+  --ink: #E9EEEC;
+  --ink-soft: #A6B3B5;
+  --muted: #707F83;
+  --line: rgba(255, 255, 255, 0.10);
+  --line-strong: rgba(255, 255, 255, 0.17);
+
+  /* Blocos teal "escuros" sobem acima do papel p/ seguir como contraste */
+  --kl-dark: #15313B;
+  --kl-dark-2: #1A3A45;
+  --kl-orange-bg: rgba(218, 106, 30, 0.16);
+
+  /* espelha p/ aliases legados */
+  --kl-text: var(--ink);
+  --kl-text-2: var(--ink-soft);
+  --kl-muted: var(--muted);
+  --kl-bg: var(--paper);
+  --kl-surface: var(--surface);
+  --kl-border: var(--line);
+  --kl-border-strong: var(--line-strong);
+}
+
 @theme inline {
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, "SFMono-Regular", monospace;
@@ -124,6 +151,8 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(8,34,44,0.18); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(8,34,44,0.3); }
+.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.16); }
+.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.28); }
 
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {

@@ -41,7 +41,7 @@ export default function DeleteProjetoButton({ id, nome }: { id: string; nome: st
       <Button
         variant="outline"
         size="sm"
-        className="gap-1.5 h-9 border-red-200 text-red-600 hover:bg-red-50"
+        className="h-9 gap-1.5 border-line text-destructive hover:bg-surface-2"
         onClick={() => setOpen(true)}
       >
         <Trash2 className="w-3.5 h-3.5" /> Deletar
@@ -50,14 +50,14 @@ export default function DeleteProjetoButton({ id, nome }: { id: string; nome: st
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-red-600">Deletar Projeto</DialogTitle>
+            <DialogTitle className="text-destructive">Deletar projeto</DialogTitle>
           </DialogHeader>
           <div className="py-2">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-ink-soft">
               Tem certeza que deseja deletar o projeto{" "}
-              <span className="font-semibold text-slate-800">{nome}</span>?
+              <span className="font-semibold text-ink">{nome}</span>?
             </p>
-            <p className="text-xs text-slate-400 mt-2">
+            <p className="mt-2 text-xs text-muted-fg">
               Esta ação é irreversível. Todos os itens e quadros associados serão removidos.
             </p>
           </div>

@@ -3,11 +3,10 @@ import { Prisma } from "@prisma/client"
 import { getSession } from "@/lib/session"
 import { Header } from "@/components/layout/Header"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
 import { formatBRL } from "@/lib/markup"
 import { AtualizarPrecoDialog } from "@/components/insumos/AtualizarPrecoDialog"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 import { Plus, Package, ChevronLeft, ChevronRight } from "lucide-react"
 
 const LIMIT = 50
@@ -67,58 +66,52 @@ export default async function InsumosPage({
     orderBy: { categoria: "asc" },
   })
 
+  const pillBase = "inline-flex h-9 cursor-pointer items-center rounded-md border px-3 text-[12px] font-medium transition-colors"
+
   return (
     <div>
       <Header
-        title="Catálogo de Insumos"
+        eyebrow="Catálogo"
+        title="Insumos"
         subtitle={`${total} insumo${total !== 1 ? "s" : ""} encontrado${total !== 1 ? "s" : ""}`}
         actions={
-          <Link href="/insumos/novo">
-            <Button className="bg-[#0f2744] hover:bg-[#1a3a5c] text-white gap-2">
-              <Plus className="w-4 h-4" />
-              Novo Insumo
-            </Button>
+          <Link
+            href="/insumos/novo"
+            className="inline-flex h-9 items-center gap-1.5 rounded-md bg-brand px-4 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover"
+          >
+            <Plus className="h-4 w-4" /> Novo insumo
           </Link>
         }
       />
 
       {/* Filtros */}
-      <div className="flex flex-wrap gap-2 mb-5">
-        <form className="flex gap-2 flex-1 min-w-0 max-w-sm">
+      <div className="mb-5 flex flex-wrap items-center gap-2">
+        <form className="flex min-w-0 max-w-sm flex-1 gap-2">
           <input
             name="q"
             defaultValue={q}
-            placeholder="Buscar por nome, código ou fabricante..."
-            className="flex-1 h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2744]/20 focus:border-[#0f2744]"
+            placeholder="Buscar por nome, código ou fabricante…"
+            className="h-9 flex-1 rounded-md border border-line bg-surface px-3 text-[13px] text-ink outline-none transition-colors placeholder:text-muted-fg focus:border-brand"
           />
-          <Button type="submit" size="sm" className="bg-[#0f2744] hover:bg-[#1a3a5c] text-white h-9">
+          <Button type="submit" size="sm" className="h-9 bg-brand text-white hover:bg-brand-hover">
             Buscar
           </Button>
         </form>
 
-        <div className="flex gap-1.5 flex-wrap">
-          <Link href="/insumos">
-            <Badge
-              className={`cursor-pointer h-9 px-3 text-xs transition-colors ${
-                !categoria
-                  ? "bg-[#0f2744] text-white border-[#0f2744]"
-                  : "bg-white text-slate-600 border-slate-200 hover:border-[#0f2744]"
-              }`}
-            >
-              Todos
-            </Badge>
+        <div className="flex flex-wrap gap-1.5">
+          <Link
+            href="/insumos"
+            className={cn(pillBase, !categoria ? "border-brand bg-brand-bg text-brand" : "border-line bg-surface text-ink-soft hover:bg-surface-2")}
+          >
+            Todos
           </Link>
           {categorias.map((c) => (
-            <Link key={c.categoria} href={`/insumos?categoria=${encodeURIComponent(c.categoria!)}`}>
-              <Badge
-                className={`cursor-pointer h-9 px-3 text-xs transition-colors ${
-                  categoria === c.categoria
-                    ? "bg-[#0f2744] text-white border-[#0f2744]"
-                    : "bg-white text-slate-600 border-slate-200 hover:border-[#0f2744]"
-                }`}
-              >
-                {c.categoria}
-              </Badge>
+            <Link
+              key={c.categoria}
+              href={`/insumos?categoria=${encodeURIComponent(c.categoria!)}`}
+              className={cn(pillBase, categoria === c.categoria ? "border-brand bg-brand-bg text-brand" : "border-line bg-surface text-ink-soft hover:bg-surface-2")}
+            >
+              {c.categoria}
             </Link>
           ))}
         </div>
@@ -126,123 +119,107 @@ export default async function InsumosPage({
 
       {componentes.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#0f2744]/10 flex items-center justify-center mb-4">
-            <Package className="w-8 h-8 text-[#0f2744]/40" />
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-surface-2 text-muted-fg">
+            <Package className="h-7 w-7" />
           </div>
-          <p className="text-lg font-semibold text-[#0f2744]">Nenhum insumo encontrado</p>
-          <p className="text-sm text-slate-500 mt-1 mb-6">
+          <p className="text-[15px] font-medium text-ink-soft">Nenhum insumo encontrado</p>
+          <p className="mb-6 mt-1 text-[13px] text-muted-fg">
             {q ? `Sem resultados para "${q}"` : "Cadastre o primeiro insumo"}
           </p>
           {!q && (
-            <Link href="/insumos/novo">
-              <Button className="bg-[#0f2744] hover:bg-[#1a3a5c] text-white gap-2">
-                <Plus className="w-4 h-4" />
-                Novo Insumo
-              </Button>
+            <Link
+              href="/insumos/novo"
+              className="inline-flex h-9 items-center gap-1.5 rounded-md bg-brand px-4 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover"
+            >
+              <Plus className="h-4 w-4" /> Novo insumo
             </Link>
           )}
         </div>
       ) : (
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-slate-100">
-                    <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                      Código / Descrição
-                    </th>
-                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                      Fabricante
-                    </th>
-                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                      Categoria
-                    </th>
-                    <th className="text-right px-4 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                      Preço de Custo
-                    </th>
+        <div className="border-t border-line">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-line">
+                  <th className="py-2.5 pl-0 pr-3 text-left text-[11px] font-medium text-muted-fg">Código / Descrição</th>
+                  <th className="px-3 py-2.5 text-left text-[11px] font-medium text-muted-fg">Fabricante</th>
+                  <th className="px-3 py-2.5 text-left text-[11px] font-medium text-muted-fg">Categoria</th>
+                  <th className={cn("px-3 py-2.5 text-right text-[11px] font-medium text-muted-fg", !isAdmin && "pr-0")}>Preço de custo</th>
+                  {isAdmin && <th className="py-2.5 pl-3 pr-0 text-center text-[11px] font-medium text-muted-fg">Ações</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {componentes.map((c, i) => (
+                  <tr key={c.id} className={cn("transition-colors hover:bg-surface-2", i > 0 && "border-t border-line")}>
+                    <td className="py-3 pl-0 pr-3">
+                      <p className="text-[13px] font-medium leading-snug text-ink">{c.descricao}</p>
+                      <p className="num mt-0.5 text-[11px] text-muted-fg">{c.codigoFabricante}</p>
+                    </td>
+                    <td className="px-3 py-3">
+                      <p className="text-[13px] text-ink-soft">{c.fabricante ?? "—"}</p>
+                    </td>
+                    <td className="px-3 py-3">
+                      {c.categoria ? (
+                        <span className="inline-flex items-center rounded-md bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-ink-soft">
+                          {c.categoria}
+                        </span>
+                      ) : (
+                        <span className="text-[12px] text-muted-fg">—</span>
+                      )}
+                    </td>
+                    <td className={cn("num px-3 py-3 text-right text-[13px] font-medium text-ink", !isAdmin && "pr-0")}>
+                      {c.precos[0] ? formatBRL(c.precos[0].precoCusto.toString()) : "—"}
+                    </td>
                     {isAdmin && (
-                      <th className="text-center px-4 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                        Ações
-                      </th>
+                      <td className="py-3 pl-3 pr-0 text-center">
+                        <AtualizarPrecoDialog
+                          componenteId={c.id}
+                          descricao={c.descricao}
+                          precoAtual={c.precos[0]?.precoCusto?.toString() ?? "0"}
+                        />
+                      </td>
                     )}
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {componentes.map((c) => (
-                    <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-3.5">
-                        <p className="text-sm font-medium text-[#0f2744] leading-snug">{c.descricao}</p>
-                        <p className="text-xs text-slate-400 mt-0.5 font-mono">{c.codigoFabricante}</p>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <p className="text-sm text-slate-600">{c.fabricante ?? "—"}</p>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        {c.categoria ? (
-                          <Badge className="bg-slate-100 text-slate-600 border-slate-200 text-xs">
-                            {c.categoria}
-                          </Badge>
-                        ) : (
-                          <span className="text-xs text-slate-300">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3.5 text-right">
-                        <span className="text-sm font-semibold text-[#0f2744]">
-                          {c.precos[0] ? formatBRL(c.precos[0].precoCusto.toString()) : "—"}
-                        </span>
-                      </td>
-                      {isAdmin && (
-                        <td className="px-4 py-3.5 text-center">
-                          <AtualizarPrecoDialog
-                            componenteId={c.id}
-                            descricao={c.descricao}
-                            precoAtual={c.precos[0]?.precoCusto?.toString() ?? "0"}
-                          />
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
-                <p className="text-xs text-slate-400">
-                  Mostrando {skip + 1}–{Math.min(skip + LIMIT, total)} de {total}
-                </p>
-                <div className="flex items-center gap-1">
-                  {page > 1 ? (
-                    <Link href={buildUrl(page - 1)}>
-                      <Button variant="outline" size="sm" className="h-8 w-8 p-0 border-slate-200">
-                        <ChevronLeft className="w-4 h-4" />
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Button variant="outline" size="sm" className="h-8 w-8 p-0 border-slate-200 opacity-40" disabled>
-                      <ChevronLeft className="w-4 h-4" />
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between border-t border-line py-4">
+              <p className="num text-[12px] text-muted-fg">
+                {skip + 1}–{Math.min(skip + LIMIT, total)} de {total}
+              </p>
+              <div className="flex items-center gap-1">
+                {page > 1 ? (
+                  <Link href={buildUrl(page - 1)}>
+                    <Button variant="outline" size="sm" className="h-8 w-8 border-line p-0">
+                      <ChevronLeft className="h-4 w-4" />
                     </Button>
-                  )}
-                  <span className="text-xs text-slate-600 px-3 font-medium">
-                    {page} / {totalPages}
-                  </span>
-                  {page < totalPages ? (
-                    <Link href={buildUrl(page + 1)}>
-                      <Button variant="outline" size="sm" className="h-8 w-8 p-0 border-slate-200">
-                        <ChevronRight className="w-4 h-4" />
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Button variant="outline" size="sm" className="h-8 w-8 p-0 border-slate-200 opacity-40" disabled>
-                      <ChevronRight className="w-4 h-4" />
+                  </Link>
+                ) : (
+                  <Button variant="outline" size="sm" className="h-8 w-8 border-line p-0 opacity-40" disabled>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                )}
+                <span className="num px-3 text-[12px] font-medium text-ink-soft">
+                  {page} / {totalPages}
+                </span>
+                {page < totalPages ? (
+                  <Link href={buildUrl(page + 1)}>
+                    <Button variant="outline" size="sm" className="h-8 w-8 border-line p-0">
+                      <ChevronRight className="h-4 w-4" />
                     </Button>
-                  )}
-                </div>
+                  </Link>
+                ) : (
+                  <Button variant="outline" size="sm" className="h-8 w-8 border-line p-0 opacity-40" disabled>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          )}
+        </div>
       )}
     </div>
   )

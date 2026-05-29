@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState } from "react"
 import { formatBRL } from "@/lib/markup"
 import { STATUS, statusStyle } from "@/lib/status"
 import { StatusBadge } from "@/components/ui/status-badge"
-import { Panel } from "@/components/ui/panel"
 import ProjetoActionsDropdown from "./ProjetoActionsDropdown"
 import { Search, FolderOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -31,7 +30,6 @@ const FILTRO_LABELS: Record<string, string> = {
 export default function ProjetosClientPage({ projetos, userRole }: { projetos: Projeto[]; userRole: string }) {
   const [busca, setBusca] = useState("")
   const [filtro, setFiltro] = useState<typeof STATUS_OPTS[number]>("TODOS")
-  const tableRef = useRef<HTMLDivElement>(null)
 
   const totalEmitido = projetos
     .filter((p) => p.status === "EMITIDO" || p.status === "VENDIDO")
@@ -70,43 +68,46 @@ export default function ProjetosClientPage({ projetos, userRole }: { projetos: P
 
   return (
     <div>
-      {/* Resumo */}
-      <div className="mb-6 grid grid-cols-[1fr_340px] gap-6">
-        <Panel className="grid grid-cols-4 overflow-hidden">
-          {stats.map((s, i) => (
-            <div key={s.l} className={cn("px-5 py-4", i > 0 && "border-l border-line")}>
-              <p className="num text-[26px] font-medium leading-none tracking-[-0.03em] text-ink">{s.v}</p>
-              <p className="mt-2 text-[12px] text-muted-fg">{s.l}</p>
+      {/* Resumo — faixa sobre o papel */}
+      <div className="grid grid-cols-5 border-y border-line">
+        {[...stats.map((s) => ({ ...s, accent: false })), { l: "Emitido + vendido", v: formatBRL(totalEmitido), accent: true }].map((s, i) => (
+          <div
+            key={s.l}
+            className={cn(
+              "py-4",
+              i > 0 && "border-l border-line",
+              i === 0 ? "pr-5" : i === 4 ? "pl-5" : "px-5"
+            )}
+          >
+            <p className={cn("num text-[23px] font-medium leading-none tracking-[-0.03em]", s.accent ? "text-brand" : "text-ink")}>
+              {s.v}
+            </p>
+            <p className="mt-2 text-[12px] text-muted-fg">{s.l}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Distribuição por status — barra full-width + legenda inline */}
+      <div className="mb-8 mt-5">
+        <div className="flex h-1.5 overflow-hidden rounded-full bg-surface-2">
+          {distribuicao.map((d) =>
+            d.value > 0 ? (
+              <span
+                key={d.key}
+                style={{ width: `${(d.value / totalDist) * 100}%`, background: statusStyle(d.key).color }}
+              />
+            ) : null
+          )}
+        </div>
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5">
+          {distribuicao.map((d) => (
+            <div key={d.key} className="flex items-center gap-1.5">
+              <span className="h-2 w-2 flex-shrink-0 rounded-full" style={{ background: statusStyle(d.key).color }} />
+              <span className="text-[12px] text-ink-soft">{d.label}</span>
+              <span className="num text-[12px] font-medium text-ink">{d.value}</span>
             </div>
           ))}
-        </Panel>
-
-        <Panel className="flex flex-col justify-center px-5 py-4">
-          <p className="text-[12px] text-muted-fg">Valor emitido + vendido</p>
-          <p className="num mt-1.5 text-[22px] font-medium tracking-[-0.02em] text-brand">
-            {formatBRL(totalEmitido)}
-          </p>
-          {/* Barra de distribuição */}
-          <div className="mt-3 flex h-1.5 overflow-hidden rounded-full bg-surface-2">
-            {distribuicao.map((d) =>
-              d.value > 0 ? (
-                <span
-                  key={d.key}
-                  style={{ width: `${(d.value / totalDist) * 100}%`, background: statusStyle(d.key).color }}
-                />
-              ) : null
-            )}
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5">
-            {distribuicao.map((d) => (
-              <div key={d.key} className="flex items-center gap-1.5">
-                <span className="h-2 w-2 flex-shrink-0 rounded-full" style={{ background: statusStyle(d.key).color }} />
-                <span className="text-[11px] text-ink-soft">{d.label}</span>
-                <span className="num ml-auto text-[11px] font-medium text-ink">{d.value}</span>
-              </div>
-            ))}
-          </div>
-        </Panel>
+        </div>
       </div>
 
       {/* Filtros */}
@@ -141,8 +142,8 @@ export default function ProjetosClientPage({ projetos, userRole }: { projetos: P
         </div>
       </div>
 
-      {/* Tabela */}
-      <Panel ref={tableRef} className="overflow-hidden">
+      {/* Tabela — sobre o papel, delimitada por régua */}
+      <div className="border-t border-line">
         {filtrados.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="mb-3.5 flex h-12 w-12 items-center justify-center rounded-lg bg-surface-2 text-muted-fg">
@@ -172,7 +173,8 @@ export default function ProjetosClientPage({ projetos, userRole }: { projetos: P
                       key={h + i}
                       className={cn(
                         "px-3.5 py-2.5 text-[11px] font-medium text-muted-fg whitespace-nowrap",
-                        i === 0 && "pl-5",
+                        i === 0 && "pl-0",
+                        i === 7 && "pr-0",
                         a === "right" && "text-right",
                         a === "center" && "text-center",
                         a === "left" && "text-left"
@@ -195,7 +197,7 @@ export default function ProjetosClientPage({ projetos, userRole }: { projetos: P
                       )}
                       onClick={() => (window.location.href = `/projetos/${p.id}`)}
                     >
-                      <td className="px-3.5 py-3.5 pl-5">
+                      <td className="py-3.5 pl-0 pr-3.5">
                         <p className="text-[13px] font-medium text-ink">{p.nome}</p>
                         <p className="num mt-0.5 text-[11px] text-muted-fg">{p.numeroReferencia}</p>
                       </td>
@@ -232,7 +234,7 @@ export default function ProjetosClientPage({ projetos, userRole }: { projetos: P
                       <td className="num px-3.5 py-3.5 text-center text-[13px] text-muted-fg">
                         {p.itens.length}
                       </td>
-                      <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
+                      <td className="py-3.5 pl-3.5 pr-0 text-right" onClick={(e) => e.stopPropagation()}>
                         <ProjetoActionsDropdown
                           id={p.id}
                           status={p.status}
@@ -249,7 +251,7 @@ export default function ProjetosClientPage({ projetos, userRole }: { projetos: P
             </table>
           </div>
         )}
-      </Panel>
+      </div>
     </div>
   )
 }

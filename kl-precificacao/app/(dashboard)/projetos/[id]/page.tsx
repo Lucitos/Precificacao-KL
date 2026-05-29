@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db"
 import { getSession } from "@/lib/session"
 import { Header } from "@/components/layout/Header"
 import { Button } from "@/components/ui/button"
-import { Panel, PanelHeader, PanelTitle } from "@/components/ui/panel"
+import { SectionHeading } from "@/components/ui/section"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { formatBRL, formatPercent } from "@/lib/markup"
 import { cancelarProjeto, duplicarProjeto, emitirProjeto, marcarVendido } from "@/actions/projetos"
@@ -20,7 +20,7 @@ const thClass = "py-2.5 text-[11px] font-medium text-muted-fg"
 function ItemRow({ item }: { item: { id: string; componente: { descricao: string; codigoFabricante: string }; quantidade: { toString(): string }; precoCustoUnitario: { toString(): string }; precoCustoTotal: { toString(): string } } }) {
   return (
     <tr className="border-t border-line transition-colors hover:bg-surface-2">
-      <td className="px-5 py-2.5">
+      <td className="py-2.5 pl-0 pr-3">
         <p className="text-[13px] font-medium leading-snug text-ink">{item.componente.descricao}</p>
         <p className="num mt-0.5 text-[11px] text-muted-fg">{item.componente.codigoFabricante}</p>
       </td>
@@ -30,7 +30,7 @@ function ItemRow({ item }: { item: { id: string; componente: { descricao: string
       <td className="num px-3 py-2.5 text-right text-[13px] text-muted-fg">
         {formatBRL(item.precoCustoUnitario.toString())}
       </td>
-      <td className="num px-4 py-2.5 text-right text-[13px] font-medium text-ink">
+      <td className="num py-2.5 pl-3 pr-0 text-right text-[13px] font-medium text-ink">
         {formatBRL(item.precoCustoTotal.toString())}
       </td>
     </tr>
@@ -41,10 +41,10 @@ function ItensHead() {
   return (
     <thead>
       <tr className="border-t border-line">
-        <th className={cn(thClass, "px-5 text-left")}>Componente</th>
+        <th className={cn(thClass, "pl-0 pr-3 text-left")}>Componente</th>
         <th className={cn(thClass, "px-3 text-center")}>Qtd</th>
         <th className={cn(thClass, "px-3 text-right")}>Unitário</th>
-        <th className={cn(thClass, "px-4 text-right")}>Total</th>
+        <th className={cn(thClass, "pl-3 pr-0 text-right")}>Total</th>
       </tr>
     </thead>
   )
@@ -147,16 +147,15 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
         }
       />
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-x-10 gap-y-8 xl:grid-cols-3">
         {/* Itens */}
-        <div className="space-y-6 xl:col-span-2">
-          <Panel className="overflow-hidden">
-            <PanelHeader>
-              <PanelTitle>Itens do projeto · {totalItens}</PanelTitle>
-              <StatusBadge status={projeto.status} />
-            </PanelHeader>
+        <div className="xl:col-span-2">
+          <SectionHeading
+            title={`Itens do projeto · ${totalItens}`}
+            action={<StatusBadge status={projeto.status} />}
+          />
 
-            {hasQuadros ? (
+          {hasQuadros ? (
               <div>
                 {projeto.quadros.map((quadro) => {
                   const subtotal = quadro.itens.reduce(
@@ -164,7 +163,7 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
                   ) * quadro.quantidade
                   return (
                     <div key={quadro.id}>
-                      <div className="flex items-center gap-2 border-t border-line bg-surface-2 px-5 py-2.5">
+                      <div className="flex items-center gap-2 border-t border-line px-0 pb-2 pt-4">
                         <LayoutGrid className="h-3.5 w-3.5 text-muted-fg" />
                         <span className="text-[13px] font-medium text-ink">{quadro.nome}</span>
                         {quadro.quantidade > 1 && (
@@ -192,7 +191,7 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
 
                 {projeto.itens.length > 0 && (
                   <div>
-                    <div className="flex items-center gap-2 border-t border-line bg-surface-2 px-5 py-2.5">
+                    <div className="flex items-center gap-2 border-t border-line px-0 pb-2 pt-4">
                       <span className="text-[13px] font-medium text-ink">Itens gerais</span>
                     </div>
                     <div className="overflow-x-auto">
@@ -208,9 +207,9 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
                   </div>
                 )}
 
-                <div className="flex items-center justify-between border-t-2 border-line-strong bg-surface-2 px-5 py-3">
+                <div className="flex items-center justify-between border-t-2 border-line-strong px-0 py-3">
                   <span className="text-[13px] font-medium text-ink">Total custo direto</span>
-                  <span className="num text-[14px] font-semibold text-ink">{formatBRL(custoDiretoCalculado)}</span>
+                  <span className="num text-[15px] font-semibold text-ink">{formatBRL(custoDiretoCalculado)}</span>
                 </div>
               </div>
             ) : (
@@ -223,11 +222,11 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr className="border-t-2 border-line-strong bg-surface-2">
-                      <td colSpan={3} className="px-5 py-3 text-[13px] font-medium text-ink">
+                    <tr className="border-t-2 border-line-strong">
+                      <td colSpan={3} className="py-3 pl-0 text-[13px] font-medium text-ink">
                         Total custo direto
                       </td>
-                      <td className="num px-4 py-3 text-right text-[14px] font-semibold text-ink">
+                      <td className="num py-3 pl-3 pr-0 text-right text-[15px] font-semibold text-ink">
                         {formatBRL(custoDiretoCalculado)}
                       </td>
                     </tr>
@@ -235,7 +234,6 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
                 </table>
               </div>
             )}
-          </Panel>
         </div>
 
         {/* Coluna lateral */}
@@ -293,43 +291,41 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
           </div>
 
           {/* DRE aplicada */}
-          <Panel className="overflow-hidden">
-            <PanelHeader className="flex-col items-start gap-0.5 py-3">
-              <PanelTitle className="text-[13px]">DRE aplicada · Exercício {snap.exercicio}</PanelTitle>
-              <p className="text-[11px] text-muted-fg">Parâmetros congelados na emissão</p>
-            </PanelHeader>
-            <div className="px-5 py-3">
+          <section>
+            <SectionHeading
+              title={`DRE aplicada · ${snap.exercicio}`}
+              description="Parâmetros congelados na emissão"
+            />
+            <div className="divide-y divide-line">
               {[
                 { label: "Custos fixos", value: formatPercent(snap.pctCustoFixo) },
                 { label: "Impostos", value: formatPercent(snap.pctCustoVariavel) },
                 { label: "Salários", value: formatPercent(snap.pctSalarios) },
-              ].map(({ label, value }, idx) => (
-                <div
-                  key={label}
-                  className={cn("flex items-center justify-between py-2", idx > 0 && "border-t border-line")}
-                >
+              ].map(({ label, value }) => (
+                <div key={label} className="flex items-center justify-between py-2.5">
                   <span className="text-[12px] text-ink-soft">{label}</span>
                   <span className="num text-[13px] font-medium text-ink">{value}</span>
                 </div>
               ))}
             </div>
-          </Panel>
+          </section>
 
           {/* Metadados */}
-          <Panel className="px-5 py-4">
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center justify-between">
+          <section>
+            <SectionHeading title="Detalhes" />
+            <div className="divide-y divide-line">
+              <div className="flex items-center justify-between py-2.5">
                 <span className="text-[12px] text-muted-fg">Responsável</span>
                 <span className="text-[12px] font-medium text-ink">{projeto.responsavel.name}</span>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between py-2.5">
                 <span className="text-[12px] text-muted-fg">Criado em</span>
                 <span className="num text-[12px] font-medium text-ink">
                   {new Date(projeto.criadoEm).toLocaleDateString("pt-BR")}
                 </span>
               </div>
               {projeto.emitidoEm && (
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between py-2.5">
                   <span className="text-[12px] text-muted-fg">Emitido em</span>
                   <span className="num text-[12px] font-medium text-ink">
                     {new Date(projeto.emitidoEm).toLocaleDateString("pt-BR")}
@@ -337,7 +333,7 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
                 </div>
               )}
             </div>
-          </Panel>
+          </section>
         </div>
       </div>
     </div>

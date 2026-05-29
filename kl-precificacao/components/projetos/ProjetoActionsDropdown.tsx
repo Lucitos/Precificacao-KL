@@ -209,14 +209,14 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-red-600">Deletar Projeto</DialogTitle>
+            <DialogTitle className="text-destructive">Deletar projeto</DialogTitle>
           </DialogHeader>
           <div className="py-2">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-ink-soft">
               Tem certeza que deseja deletar o projeto{" "}
-              <span className="font-semibold text-slate-800">{nomeProjeto}</span>?
+              <span className="font-semibold text-ink">{nomeProjeto}</span>?
             </p>
-            <p className="text-xs text-slate-400 mt-2">
+            <p className="mt-2 text-xs text-muted-fg">
               Esta ação é irreversível. Todos os itens e quadros associados serão removidos.
             </p>
           </div>

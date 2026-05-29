@@ -45,7 +45,7 @@ export function AtualizarPrecoDialog({ componenteId, descricao, precoAtual }: Pr
         <Button
           variant="outline"
           size="sm"
-          className="h-7 px-2 text-xs border-slate-200 text-slate-500 hover:text-[#0f2744] hover:border-[#0f2744]/30 gap-1"
+          className="h-7 gap-1 border-line px-2 text-xs text-ink-soft hover:bg-surface-2 hover:text-ink"
         >
           <Pencil className="w-3 h-3" />
           Preço
@@ -53,21 +53,21 @@ export function AtualizarPrecoDialog({ componenteId, descricao, precoAtual }: Pr
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-[#0f2744]">Atualizar Preço</DialogTitle>
+          <DialogTitle className="text-ink">Atualizar preço</DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-slate-500 -mt-2 leading-snug">{descricao}</p>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+        <p className="-mt-2 text-sm leading-snug text-muted-fg">{descricao}</p>
+        <form onSubmit={handleSubmit} className="mt-2 space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-[#0f2744]">Preço de Custo Atual</Label>
+            <Label className="text-sm font-medium text-ink">Preço de custo atual</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">R$</span>
+              <span className="num absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-fg">R$</span>
               <Input
                 value={novoPreco}
                 onChange={(e) => setNovoPreco(e.target.value)}
                 type="number"
                 step="0.01"
                 min="0"
-                className="h-10 pl-9"
+                className="num h-10 pl-9"
                 required
               />
             </div>
@@ -76,9 +76,9 @@ export function AtualizarPrecoDialog({ componenteId, descricao, precoAtual }: Pr
             <Button
               type="submit"
               disabled={isPending}
-              className="flex-1 bg-[#0f2744] hover:bg-[#1a3a5c] text-white"
+              className="flex-1 bg-brand text-white hover:bg-brand-hover"
             >
-              {isPending ? "Salvando..." : "Salvar Preço"}
+              {isPending ? "Salvando..." : "Salvar preço"}
             </Button>
             <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
               Cancelar

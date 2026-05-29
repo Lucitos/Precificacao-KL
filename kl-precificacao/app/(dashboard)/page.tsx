@@ -4,7 +4,7 @@ import { formatBRL, formatPercent } from "@/lib/markup"
 import { ArrowRight, Plus } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { Panel, PanelHeader, PanelTitle } from "@/components/ui/panel"
+import { SectionHeading } from "@/components/ui/section"
 import { Stat } from "@/components/ui/stat"
 import { StatusBadge } from "@/components/ui/status-badge"
 
@@ -95,7 +95,7 @@ export default async function DashboardPage() {
   return (
     <div>
       {/* Cabeçalho */}
-      <div className="mb-7 flex items-end justify-between gap-4 border-b border-line pb-5">
+      <div className="mb-8 flex items-end justify-between gap-4">
         <div>
           <p className="mb-1.5 text-[12px] font-medium text-muted-fg">Visão geral</p>
           <h1 className="text-[27px] font-semibold leading-[1.1] tracking-[-0.025em] text-ink">
@@ -114,49 +114,54 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Faixa de KPIs */}
-      <Panel className="mb-6 grid grid-cols-3 overflow-hidden">
-        {kpis.map((k, i) => (
-          <div
-            key={k.label}
-            className={cn(
-              "p-5",
-              i % 3 !== 2 && "border-r border-line",
-              i >= 3 && "border-t border-line"
-            )}
-          >
-            <Stat label={k.label} value={k.value} sub={k.sub} accent={k.accent} />
-          </div>
-        ))}
-      </Panel>
-
-      <div className="grid grid-cols-[1fr_300px] gap-6">
-        {/* Projetos recentes */}
-        <Panel className="overflow-hidden">
-          <PanelHeader>
-            <PanelTitle>Últimos projetos</PanelTitle>
-            <Link
-              href="/projetos"
-              className="inline-flex items-center gap-1 text-[12px] font-medium text-brand transition-colors hover:text-brand-hover"
+      {/* Faixa de KPIs — sobre o papel, dividida por réguas */}
+      <div className="mb-10 grid grid-cols-3 border-y border-line">
+        {kpis.map((k, i) => {
+          const col = i % 3
+          return (
+            <div
+              key={k.label}
+              className={cn(
+                "py-5",
+                col !== 2 && "border-r border-line",
+                col === 0 ? "pr-6" : col === 2 ? "pl-6" : "px-6",
+                i >= 3 && "border-t border-line"
+              )}
             >
-              Ver todos <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </PanelHeader>
+              <Stat label={k.label} value={k.value} sub={k.sub} accent={k.accent} />
+            </div>
+          )
+        })}
+      </div>
 
+      <div className="grid grid-cols-[1fr_300px] gap-10">
+        {/* Projetos recentes */}
+        <section>
+          <SectionHeading
+            title="Últimos projetos"
+            action={
+              <Link
+                href="/projetos"
+                className="inline-flex items-center gap-1 text-[12px] font-medium text-brand transition-colors hover:text-brand-hover"
+              >
+                Ver todos <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            }
+          />
           {projetos.length === 0 ? (
-            <div className="px-5 py-12 text-center text-[13px] text-muted-fg">
+            <div className="py-10 text-[13px] text-muted-fg">
               Nenhum projeto ainda.{" "}
               <Link href="/projetos/novo" className="font-medium text-brand">
                 Criar o primeiro →
               </Link>
             </div>
           ) : (
-            <ul>
+            <ul className="-mt-1">
               {projetos.map((p, i) => (
                 <li key={p.id} className={i > 0 ? "border-t border-line" : ""}>
                   <Link
                     href={`/projetos/${p.id}`}
-                    className="group flex items-center gap-4 px-5 py-3 transition-colors hover:bg-surface-2"
+                    className="group -mx-2 flex items-center gap-4 rounded-md px-2 py-3 transition-colors hover:bg-surface-2"
                   >
                     <span className="num w-6 flex-shrink-0 text-[12px] text-muted-fg">
                       {String(i + 1).padStart(2, "0")}
@@ -178,11 +183,11 @@ export default async function DashboardPage() {
               ))}
             </ul>
           )}
-        </Panel>
+        </section>
 
         {/* Coluna direita */}
-        <div className="flex flex-col gap-6">
-          {/* Painel DRE (escuro) */}
+        <div className="flex flex-col gap-8">
+          {/* Painel DRE (escuro — contraste pontual) */}
           <div className="relative overflow-hidden rounded-lg bg-dark text-white">
             <div className="tech-grid pointer-events-none absolute inset-0" aria-hidden />
             <div className="relative flex items-center justify-between border-b border-white/[0.08] px-4 py-3.5">
@@ -233,70 +238,55 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* Resumo financeiro */}
-          <Panel className="overflow-hidden">
-            <PanelHeader>
-              <PanelTitle>Resumo financeiro</PanelTitle>
-            </PanelHeader>
+          {/* Resumo financeiro — sobre o papel */}
+          <section>
+            <SectionHeading title="Resumo financeiro" />
             <div className="divide-y divide-line">
-              <div className="px-5 py-3.5">
+              <div className="py-3">
                 <Stat label="Total emitido" value={formatBRL(valorTotal)} accent />
               </div>
-              <div className="grid grid-cols-2 divide-x divide-line">
-                <div className="px-5 py-3.5">
-                  <p className="text-[12px] text-muted-fg">Ticket médio</p>
-                  <p className="num mt-1.5 text-[15px] font-medium text-ink">
-                    {ticketMedio > 0 ? formatBRL(ticketMedio) : "—"}
-                  </p>
-                </div>
-                <div className="px-5 py-3.5">
-                  <p className="text-[12px] text-muted-fg">Margem média</p>
-                  <p className="num mt-1.5 text-[15px] font-medium text-ink">
-                    {margemMedia > 0 ? `${margemMedia.toFixed(1)}%` : "—"}
-                  </p>
-                </div>
+              <div className="flex items-center justify-between py-3">
+                <span className="text-[12px] text-muted-fg">Ticket médio</span>
+                <span className="num text-[14px] font-medium text-ink">
+                  {ticketMedio > 0 ? formatBRL(ticketMedio) : "—"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <span className="text-[12px] text-muted-fg">Margem média</span>
+                <span className="num text-[14px] font-medium text-ink">
+                  {margemMedia > 0 ? `${margemMedia.toFixed(1)}%` : "—"}
+                </span>
               </div>
             </div>
-          </Panel>
+          </section>
         </div>
       </div>
 
-      {/* Indicadores mensais — numéricos + sparkline */}
-      <div className="mt-6">
-        <div className="mb-4 flex items-baseline justify-between">
-          <h2 className="text-[14px] font-semibold tracking-[-0.01em] text-ink">Indicadores mensais</h2>
-          <span className="num text-[12px] text-muted-fg">{periodoLabel}</span>
+      {/* Indicadores mensais — numéricos + sparkline, sobre o papel */}
+      <section className="mt-10">
+        <SectionHeading
+          title="Indicadores mensais"
+          action={<span className="num text-[12px] text-muted-fg">{periodoLabel}</span>}
+        />
+        <div className="grid grid-cols-3">
+          {[
+            { label: "Projetos criados", value: totalCriados, sub: "total no período", spark: dadosMensais.map((d) => d.criados), color: "var(--kl-orange)" },
+            { label: "Valor emitido", value: formatBRL(totalEmitido6m), sub: "total no período", spark: dadosMensais.map((d) => d.valorEmitido), color: "#2E7D52" },
+            { label: "Markup médio", value: markupMedio6m > 0 ? `${markupMedio6m.toFixed(3)}×` : "—", sub: "média do período", spark: dadosMensais.map((d) => d.markupMedio), color: "#2B6BBF" },
+          ].map((ind, i) => (
+            <div
+              key={ind.label}
+              className={cn(
+                "py-1",
+                i !== 2 && "border-r border-line",
+                i === 0 ? "pr-6" : i === 2 ? "pl-6" : "px-6"
+              )}
+            >
+              <Stat label={ind.label} value={ind.value} sub={ind.sub} spark={ind.spark} sparkColor={ind.color} />
+            </div>
+          ))}
         </div>
-        <div className="grid grid-cols-3 gap-6">
-          <Panel className="p-5">
-            <Stat
-              label="Projetos criados"
-              value={totalCriados}
-              sub="total no período"
-              spark={dadosMensais.map((d) => d.criados)}
-              sparkColor="var(--kl-orange)"
-            />
-          </Panel>
-          <Panel className="p-5">
-            <Stat
-              label="Valor emitido"
-              value={formatBRL(totalEmitido6m)}
-              sub="total no período"
-              spark={dadosMensais.map((d) => d.valorEmitido)}
-              sparkColor="#2E7D52"
-            />
-          </Panel>
-          <Panel className="p-5">
-            <Stat
-              label="Markup médio"
-              value={markupMedio6m > 0 ? `${markupMedio6m.toFixed(3)}×` : "—"}
-              sub="média do período"
-              spark={dadosMensais.map((d) => d.markupMedio)}
-              sparkColor="#2B6BBF"
-            />
-          </Panel>
-        </div>
-      </div>
+      </section>
     </div>
   )
 }
