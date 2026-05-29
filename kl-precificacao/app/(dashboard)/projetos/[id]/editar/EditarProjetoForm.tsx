@@ -5,15 +5,15 @@ import { useRouter } from "next/navigation"
 import { atualizarProjeto, type QuadroInput } from "@/actions/projetos"
 import { calcularPrecificacao, formatBRL, formatPercent } from "@/lib/markup"
 import { Header } from "@/components/layout/Header"
+import { SectionHeading } from "@/components/ui/section"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
-import Image from "next/image"
+import { cn } from "@/lib/utils"
 import {
   ArrowLeft, Search, Plus, Trash2,
-  Loader2, Save, LayoutGrid, CheckCircle,
+  Loader2, Save, LayoutGrid, Check,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -244,38 +244,40 @@ export default function EditarProjetoForm({
     }
   }
 
+  const inputMini = "h-8 w-14 rounded-md border border-line bg-surface text-center text-[13px] text-ink outline-none focus:border-brand"
+
   return (
     <div>
       <Header
-        title="Editar Projeto"
+        eyebrow="Projetos"
+        title="Editar projeto"
         subtitle={`${numeroReferencia} · ${cliente || "—"}`}
         actions={
-          <Link href={`/projetos/${id}`}>
-            <Button variant="outline" className="gap-2 border-slate-200 text-slate-600">
-              <ArrowLeft className="w-4 h-4" /> Voltar
-            </Button>
+          <Link
+            href={`/projetos/${id}`}
+            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line px-3 text-[13px] font-medium text-ink-soft transition-colors hover:bg-surface-2 hover:text-ink"
+          >
+            <ArrowLeft className="h-4 w-4" /> Voltar
           </Link>
         }
       />
 
       <div className="flex gap-6">
-        <div className="flex-1 min-w-0 space-y-4">
+        <div className="min-w-0 flex-1 space-y-6">
           {/* Dados básicos */}
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-semibold text-[#0f2744]">Dados do Projeto</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <section>
+            <SectionHeading title="Dados do projeto" />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-[#0f2744]">Nome do Projeto *</Label>
+                <Label className="text-[13px] font-medium text-ink">Nome do projeto *</Label>
                 <Input value={nome} onChange={(e) => setNome(e.target.value)} className="h-10" />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-[#0f2744]">Cliente *</Label>
+                <Label className="text-[13px] font-medium text-ink">Cliente *</Label>
                 <Input value={cliente} onChange={(e) => setCliente(e.target.value)} className="h-10" />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
-                <Label className="text-sm font-medium text-[#0f2744]">Descrição</Label>
+                <Label className="text-[13px] font-medium text-ink">Descrição</Label>
                 <Input
                   value={descricao}
                   onChange={(e) => setDescricao(e.target.value)}
@@ -285,33 +287,27 @@ export default function EditarProjetoForm({
               </div>
               <div className="space-y-3 sm:col-span-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-sm font-medium text-[#0f2744]">Margem de Lucro</Label>
-                  <span className="text-2xl font-bold text-[#0f2744]">{margem}%</span>
+                  <Label className="text-[13px] font-medium text-ink">Margem de lucro</Label>
+                  <span className="num text-[22px] font-medium text-ink">{margem}%</span>
                 </div>
                 <input
                   type="range" min={5} max={80} step={1}
                   value={margem}
                   onChange={(e) => setMargem(Number(e.target.value))}
-                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-slate-200"
-                  style={{ accentColor: "#0f2744" }}
+                  className="w-full cursor-pointer"
                 />
-                <div className="flex justify-between text-xs text-slate-400">
+                <div className="num flex justify-between text-[11px] text-muted-fg">
                   <span>5%</span><span>40%</span><span>80%</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
           {/* Quadros */}
           <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-500">{quadros.length} quadro{quadros.length !== 1 ? "s" : ""} · {itens.length} insumo{itens.length !== 1 ? "s" : ""}</p>
-            <Button
-              onClick={adicionarQuadro}
-              variant="outline"
-              size="sm"
-              className="gap-1.5 border-[#0f2744]/30 text-[#0f2744] hover:bg-[#0f2744]/5"
-            >
-              <Plus className="w-3.5 h-3.5" /> Adicionar Quadro
+            <p className="num text-[13px] text-muted-fg">{quadros.length} quadro{quadros.length !== 1 ? "s" : ""} · {itens.length} insumo{itens.length !== 1 ? "s" : ""}</p>
+            <Button onClick={adicionarQuadro} variant="outline" size="sm" className="gap-1.5 border-line text-ink hover:bg-surface-2">
+              <Plus className="h-3.5 w-3.5" /> Adicionar quadro
             </Button>
           </div>
 
@@ -321,126 +317,123 @@ export default function EditarProjetoForm({
             const subtotal = quadroItens.reduce((acc, i) => acc + i.quantidade * i.precoCustoUnitario, 0) * quadro.quantidade
 
             return (
-              <Card key={quadro.localId} className="border-0 shadow-sm">
-                <CardHeader className="pb-3">
+              <div key={quadro.localId} className="rounded-lg border border-line">
+                <div className="border-b border-line p-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-[#0f2744]/10 flex-shrink-0">
-                      <LayoutGrid className="w-3.5 h-3.5 text-[#0f2744]" />
+                    <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-surface-2">
+                      <LayoutGrid className="h-3.5 w-3.5 text-ink-soft" />
                     </div>
                     <Input
                       value={quadro.nome}
                       onChange={(e) => handleQuadroNome(quadro.localId, e.target.value)}
                       placeholder={`Quadro ${qIdx + 1} (ex: QD Principal)`}
-                      className="h-9 flex-1 font-semibold text-[#0f2744] border-0 border-b border-slate-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-[#0f2744]"
+                      className="h-9 flex-1 rounded-none border-0 border-b border-line px-0 font-semibold text-ink focus-visible:border-brand focus-visible:ring-0"
                     />
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <span className="text-xs text-slate-400">Qtd:</span>
+                    <div className="flex flex-shrink-0 items-center gap-1.5">
+                      <span className="text-[12px] text-muted-fg">Qtd:</span>
                       <input
-                        type="number"
-                        min="1"
-                        step="1"
+                        type="number" min="1" step="1"
                         value={quadro.quantidadeStr}
                         onChange={(e) => handleQuadroQtyChange(quadro.localId, e.target.value)}
                         onBlur={() => handleQuadroQtyBlur(quadro.localId)}
-                        className="w-14 h-8 text-center text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-[#0f2744] bg-white"
+                        className={cn(inputMini, "num")}
                       />
                     </div>
                     {quadros.length > 1 && (
                       <button
                         onClick={() => removerQuadro(quadro.localId)}
-                        className="p-1.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0"
+                        className="flex-shrink-0 rounded-md p-1.5 text-muted-fg transition-colors hover:bg-surface-2 hover:text-destructive"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     )}
                   </div>
                   {subtotal > 0 && (
-                    <p className="text-xs text-slate-400 mt-1 ml-10">
+                    <p className="num ml-10 mt-1 text-[11px] text-muted-fg">
                       {quadroItens.length} insumo{quadroItens.length !== 1 ? "s" : ""} · subtotal {formatBRL(subtotal)}
                     </p>
                   )}
-                </CardHeader>
-                <CardContent className="space-y-3 pt-0">
+                </div>
+
+                <div className="space-y-3 p-3">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-fg" />
                     <Input
                       value={quadro.busca}
                       onChange={(e) => handleQuadroBusca(quadro.localId, e.target.value)}
-                      placeholder="Buscar insumo por nome, código ou fabricante..."
+                      placeholder="Buscar insumo por nome, código ou fabricante…"
                       className="h-10 pl-9 pr-9"
                     />
                     {carregandoCatalogo && (
-                      <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 animate-spin" />
+                      <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-fg" />
                     )}
                   </div>
 
                   {resultados.length > 0 && (
-                    <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 shadow-lg bg-white">
+                    <div className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface">
                       {resultados.map((comp) => (
                         <button
                           key={comp.id}
                           onClick={() => adicionarItem(comp, quadro.localId)}
-                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#f0f4f8] text-left transition-colors group"
+                          className="group flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-surface-2"
                         >
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-[#0f2744] truncate">{comp.descricao}</p>
-                            <p className="text-xs text-slate-400 mt-0.5">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-[13px] font-medium text-ink">{comp.descricao}</p>
+                            <p className="num mt-0.5 text-[11px] text-muted-fg">
                               {comp.codigoFabricante}
                               {comp.fabricante && ` · ${comp.fabricante}`}
                             </p>
                           </div>
                           <div className="flex-shrink-0 text-right">
-                            <p className="text-sm font-semibold text-[#0f2744]">{formatBRL(comp.precoCusto)}</p>
-                            <p className="text-xs text-slate-400">{comp.unidadeMedida}</p>
+                            <p className="num text-[13px] font-medium text-ink">{formatBRL(comp.precoCusto)}</p>
+                            <p className="text-[11px] text-muted-fg">{comp.unidadeMedida}</p>
                           </div>
-                          <Plus className="w-4 h-4 text-[#f59e0b] flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <Plus className="h-4 w-4 flex-shrink-0 text-brand opacity-0 transition-opacity group-hover:opacity-100" />
                         </button>
                       ))}
                     </div>
                   )}
 
                   {quadroItens.length > 0 && (
-                    <div className="overflow-x-auto border border-slate-100 rounded-xl">
+                    <div className="overflow-x-auto rounded-lg border border-line">
                       <table className="w-full">
                         <thead>
-                          <tr className="border-b border-slate-100 bg-slate-50/50">
-                            <th className="text-left px-4 py-2.5 text-xs font-semibold text-slate-400">Descrição</th>
-                            <th className="text-center px-3 py-2.5 text-xs font-semibold text-slate-400">Qtd</th>
-                            <th className="text-right px-3 py-2.5 text-xs font-semibold text-slate-400">Unit.</th>
-                            <th className="text-right px-3 py-2.5 text-xs font-semibold text-slate-400">Total</th>
-                            <th className="px-3 py-2.5" />
+                          <tr className="border-b border-line bg-surface-2">
+                            <th className="px-3 py-2 text-left text-[11px] font-medium text-muted-fg">Descrição</th>
+                            <th className="px-3 py-2 text-center text-[11px] font-medium text-muted-fg">Qtd</th>
+                            <th className="px-3 py-2 text-right text-[11px] font-medium text-muted-fg">Unit.</th>
+                            <th className="px-3 py-2 text-right text-[11px] font-medium text-muted-fg">Total</th>
+                            <th className="px-3 py-2" />
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody>
                           {quadroItens.map((item) => (
-                            <tr key={item.localId} className="hover:bg-slate-50/50">
-                              <td className="px-4 py-2.5">
-                                <p className="text-sm font-medium text-[#0f2744] leading-snug">{item.descricao}</p>
-                                <p className="text-xs text-slate-400 font-mono">{item.codigoFabricante}</p>
+                            <tr key={item.localId} className="border-t border-line hover:bg-surface-2">
+                              <td className="px-3 py-2.5">
+                                <p className="text-[13px] font-medium leading-snug text-ink">{item.descricao}</p>
+                                <p className="num text-[11px] text-muted-fg">{item.codigoFabricante}</p>
                               </td>
                               <td className="px-3 py-2.5 text-center">
                                 <input
-                                  type="number"
-                                  min="1"
-                                  step="1"
+                                  type="number" min="1" step="1"
                                   value={item.quantidadeStr}
                                   onChange={(e) => handleQtyChange(item.localId, e.target.value)}
                                   onBlur={() => handleQtyBlur(item.localId)}
-                                  className="w-16 h-8 text-center text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-[#0f2744] bg-white"
+                                  className={cn(inputMini, "num w-16")}
                                 />
                               </td>
-                              <td className="px-3 py-2.5 text-right text-sm text-slate-600">
+                              <td className="num px-3 py-2.5 text-right text-[13px] text-muted-fg">
                                 {formatBRL(item.precoCustoUnitario)}
                               </td>
-                              <td className="px-3 py-2.5 text-right text-sm font-semibold text-[#0f2744]">
+                              <td className="num px-3 py-2.5 text-right text-[13px] font-medium text-ink">
                                 {formatBRL(item.quantidade * item.precoCustoUnitario)}
                               </td>
                               <td className="px-3 py-2.5 text-center">
                                 <button
                                   onClick={() => removerItem(item.localId)}
-                                  className="p-1.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                                  className="rounded-md p-1.5 text-muted-fg transition-colors hover:bg-surface-2 hover:text-destructive"
                                 >
-                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <Trash2 className="h-3.5 w-3.5" />
                                 </button>
                               </td>
                             </tr>
@@ -451,85 +444,80 @@ export default function EditarProjetoForm({
                   )}
 
                   {quadroItens.length === 0 && (
-                    <p className="text-sm text-slate-400 text-center py-4 border border-dashed border-slate-200 rounded-xl">
+                    <p className="rounded-lg border border-dashed border-line py-4 text-center text-[13px] text-muted-fg">
                       Busque e adicione insumos acima
                     </p>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )
           })}
 
           {/* Botões */}
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <Button
               onClick={() => handleSalvar(false)}
               disabled={loading}
               variant="outline"
-              className="gap-2 border-slate-200 text-slate-600 hover:text-[#0f2744]"
+              className="gap-2 border-line text-ink-soft hover:bg-surface-2 hover:text-ink"
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Salvar Rascunho
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Salvar rascunho
             </Button>
             <Button
               onClick={() => handleSalvar(true)}
               disabled={loading}
-              className="flex-1 bg-[#0f2744] hover:bg-[#1a3a5c] text-white gap-2"
+              className="flex-1 gap-2 bg-brand text-white hover:bg-brand-hover"
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-              Salvar e Emitir
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              Salvar e emitir
             </Button>
           </div>
         </div>
 
-        {/* Painel de precificação */}
+        {/* Painel de precificação (escuro) */}
         <div className="w-72 flex-shrink-0">
-          <Card className="border-0 shadow-sm bg-[#0f2744] text-white sticky top-6">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2.5">
-                <Image src="/kl-logo.png" alt="KL" width={26} height={26} className="rounded-lg flex-shrink-0" />
-                <CardTitle className="text-sm text-white font-semibold">Precificação</CardTitle>
-              </div>
-              <p className="text-xs text-blue-200/60 mt-0.5">Margem: {margem}%</p>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div className="flex justify-between py-2 border-b border-white/10">
-                <span className="text-blue-200/70">Custo Direto</span>
-                <span className="font-semibold">{formatBRL(custoDireto)}</span>
+          <div className="sticky top-2 overflow-hidden rounded-lg bg-dark text-white">
+            <div className="tech-grid pointer-events-none absolute inset-0" aria-hidden />
+            <div className="relative border-b border-white/[0.08] px-4 py-3.5">
+              <p className="text-[13px] font-semibold text-white">Precificação</p>
+              <p className="num mt-0.5 text-[12px] text-white/45">Margem {margem}%</p>
+            </div>
+            <div className="relative px-4 py-3 text-[13px]">
+              <div className="flex justify-between border-b border-white/[0.08] py-2">
+                <span className="text-white/55">Custo direto</span>
+                <span className="num font-medium text-white">{formatBRL(custoDireto)}</span>
               </div>
               {resultado && (
                 <>
-                  <div className="flex justify-between py-1.5">
-                    <span className="text-blue-200/60 text-xs">Custos Fixos ({formatPercent(dre?.pctCustoFixo ?? "0")})</span>
-                    <span className="text-xs">{formatBRL(resultado.custoFixoValor)}</span>
+                  {[
+                    { l: `Custos fixos (${formatPercent(dre?.pctCustoFixo ?? "0")})`, v: resultado.custoFixoValor },
+                    { l: `Impostos (${formatPercent(dre?.pctCustoVariavel ?? "0")})`, v: resultado.custoVariavelValor },
+                    { l: `Salários (${formatPercent(dre?.pctSalarios ?? "0")})`, v: resultado.salariosValor },
+                    { l: `Margem (${margem}%)`, v: resultado.margemValor },
+                  ].map((row) => (
+                    <div key={row.l} className="flex justify-between py-1.5">
+                      <span className="text-[11px] text-white/50">{row.l}</span>
+                      <span className="num text-[12px] text-white/85">{formatBRL(row.v)}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-between border-t border-white/[0.08] py-2">
+                    <span className="text-[12px] font-medium text-brand-bright">Preço de venda</span>
+                    <span className="num text-[16px] font-medium text-brand-bright">{formatBRL(resultado.precoVenda)}</span>
                   </div>
-                  <div className="flex justify-between py-1.5">
-                    <span className="text-blue-200/60 text-xs">Impostos ({formatPercent(dre?.pctCustoVariavel ?? "0")})</span>
-                    <span className="text-xs">{formatBRL(resultado.custoVariavelValor)}</span>
-                  </div>
-                  <div className="flex justify-between py-1.5">
-                    <span className="text-blue-200/60 text-xs">Salários ({formatPercent(dre?.pctSalarios ?? "0")})</span>
-                    <span className="text-xs">{formatBRL(resultado.salariosValor)}</span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-b border-white/10">
-                    <span className="text-blue-200/60 text-xs">Margem ({margem}%)</span>
-                    <span className="text-xs">{formatBRL(resultado.margemValor)}</span>
-                  </div>
-                  <div className="flex justify-between py-2">
-                    <span className="font-semibold text-[#f59e0b]">Preço de Venda</span>
-                    <span className="font-bold text-[#f59e0b] text-base">{formatBRL(resultado.precoVenda)}</span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-t border-white/10">
-                    <span className="text-blue-200/60 text-xs">Markup</span>
-                    <span className="font-semibold text-xs">{Number(resultado.markup).toFixed(4)}×</span>
+                  <div className="flex justify-between py-1">
+                    <span className="text-[11px] text-white/50">Markup</span>
+                    <span className="num text-[12px] text-white/80">{Number(resultado.markup).toFixed(4)}×</span>
                   </div>
                 </>
               )}
               {!dre && (
-                <p className="text-xs text-red-300 text-center py-2">Nenhum DRE ativo. Configure em Parâmetros DRE.</p>
+                <p className="py-2 text-center text-[12px]" style={{ color: "#E8896B" }}>
+                  Nenhum DRE ativo. Configure em Parâmetros DRE.
+                </p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

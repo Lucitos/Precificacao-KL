@@ -15,7 +15,7 @@ export default async function ConfiguracoesPage() {
       <Header eyebrow="Conta" title="Configurações" subtitle="Preferências do sistema e da sua conta." />
 
       {/* Aparência */}
-      <section className="mb-10">
+      <section className="mb-8">
         <SectionHeading title="Aparência" description="Tema da interface em todo o sistema." />
         <div className="flex items-center justify-between gap-4 py-1">
           <div>

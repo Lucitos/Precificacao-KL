@@ -147,7 +147,7 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
         }
       />
 
-      <div className="grid grid-cols-1 gap-x-10 gap-y-8 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-x-8 gap-y-7 xl:grid-cols-3">
         {/* Itens */}
         <div className="xl:col-span-2">
           <SectionHeading

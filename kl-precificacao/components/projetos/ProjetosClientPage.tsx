@@ -88,7 +88,7 @@ export default function ProjetosClientPage({ projetos, userRole }: { projetos: P
       </div>
 
       {/* Distribuição por status — barra full-width + legenda inline */}
-      <div className="mb-8 mt-5">
+      <div className="mb-6 mt-4">
         <div className="flex h-1.5 overflow-hidden rounded-full bg-surface-2">
           {distribuicao.map((d) =>
             d.value > 0 ? (

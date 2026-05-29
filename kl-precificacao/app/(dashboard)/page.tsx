@@ -95,13 +95,13 @@ export default async function DashboardPage() {
   return (
     <div>
       {/* Cabeçalho */}
-      <div className="mb-8 flex items-end justify-between gap-4">
+      <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <p className="mb-1.5 text-[12px] font-medium text-muted-fg">Visão geral</p>
-          <h1 className="text-[27px] font-semibold leading-[1.1] tracking-[-0.025em] text-ink">
+          <p className="mb-1 text-[12px] font-medium text-muted-fg">Visão geral</p>
+          <h1 className="text-[24px] font-semibold leading-[1.1] tracking-[-0.025em] text-ink">
             Olá, {session?.name?.split(" ")[0]}
           </h1>
-          <p className="mt-1.5 text-[13px] text-ink-soft">
+          <p className="mt-1 text-[13px] text-ink-soft">
             Resumo dos seus projetos de precificação.
           </p>
         </div>
@@ -115,14 +115,14 @@ export default async function DashboardPage() {
       </div>
 
       {/* Faixa de KPIs — sobre o papel, dividida por réguas */}
-      <div className="mb-10 grid grid-cols-3 border-y border-line">
+      <div className="mb-7 grid grid-cols-3 border-y border-line">
         {kpis.map((k, i) => {
           const col = i % 3
           return (
             <div
               key={k.label}
               className={cn(
-                "py-5",
+                "py-4",
                 col !== 2 && "border-r border-line",
                 col === 0 ? "pr-6" : col === 2 ? "pl-6" : "px-6",
                 i >= 3 && "border-t border-line"
@@ -134,7 +134,7 @@ export default async function DashboardPage() {
         })}
       </div>
 
-      <div className="grid grid-cols-[1fr_300px] gap-10">
+      <div className="grid grid-cols-[1fr_300px] gap-8">
         {/* Projetos recentes */}
         <section>
           <SectionHeading
@@ -186,7 +186,7 @@ export default async function DashboardPage() {
         </section>
 
         {/* Coluna direita */}
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           {/* Painel DRE (escuro — contraste pontual) */}
           <div className="relative overflow-hidden rounded-lg bg-dark text-white">
             <div className="tech-grid pointer-events-none absolute inset-0" aria-hidden />
@@ -263,7 +263,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Indicadores mensais — numéricos + sparkline, sobre o papel */}
-      <section className="mt-10">
+      <section className="mt-7">
         <SectionHeading
           title="Indicadores mensais"
           action={<span className="num text-[12px] text-muted-fg">{periodoLabel}</span>}

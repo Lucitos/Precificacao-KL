@@ -5,15 +5,14 @@ import { useRouter } from "next/navigation"
 import { criarProjeto, type QuadroInput } from "@/actions/projetos"
 import { calcularPrecificacao, formatBRL, formatPercent } from "@/lib/markup"
 import { Header } from "@/components/layout/Header"
+import { SectionHeading } from "@/components/ui/section"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import Image from "next/image"
+import { cn } from "@/lib/utils"
 import {
-  ArrowLeft, ArrowRight, Search, Plus, Trash2, CheckCircle,
+  ArrowLeft, ArrowRight, Search, Plus, Trash2, Check,
   Loader2, LayoutGrid, Save,
 } from "lucide-react"
 import Link from "next/link"
@@ -54,7 +53,7 @@ interface DRESnapshot {
   pctSalarios: string
 }
 
-const ETAPAS = ["Dados do Projeto", "Quadros e Componentes", "Resumo"]
+const ETAPAS = ["Dados do projeto", "Quadros e componentes", "Resumo"]
 
 let _idCounter = 0
 const nextId = () => `local-${Date.now()}-${++_idCounter}`
@@ -237,103 +236,102 @@ export default function NovoProjetoPage() {
     }
   }
 
+  const inputMini = "h-8 w-14 rounded-md border border-line bg-surface text-center text-[13px] text-ink outline-none focus:border-brand"
+
   return (
     <div>
       <Header
-        title="Novo Projeto"
+        eyebrow="Projetos"
+        title="Novo projeto"
         subtitle="Crie um projeto de precificação"
         actions={
-          <Link href="/projetos">
-            <Button variant="outline" className="gap-2 border-slate-200 text-slate-600">
-              <ArrowLeft className="w-4 h-4" /> Voltar
-            </Button>
+          <Link
+            href="/projetos"
+            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line px-3 text-[13px] font-medium text-ink-soft transition-colors hover:bg-surface-2 hover:text-ink"
+          >
+            <ArrowLeft className="h-4 w-4" /> Voltar
           </Link>
         }
       />
 
       {/* Stepper */}
-      <div className="flex items-center gap-2 mb-8">
-        {ETAPAS.map((label, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <div
-              className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold transition-all ${
-                i === etapa ? "bg-[#0f2744] text-white"
-                : i < etapa ? "bg-[#f59e0b] text-[#0f2744]"
-                : "bg-slate-200 text-slate-400"
-              }`}
-            >
-              {i < etapa ? <CheckCircle className="w-4 h-4" /> : i + 1}
+      <div className="mb-7 flex items-center gap-2">
+        {ETAPAS.map((label, i) => {
+          const done = i < etapa
+          const current = i === etapa
+          return (
+            <div key={i} className="flex items-center gap-2">
+              <div
+                className={cn(
+                  "flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-semibold transition-colors",
+                  current ? "bg-brand text-white"
+                  : done ? "border border-brand bg-brand-bg text-brand"
+                  : "bg-surface-2 text-muted-fg"
+                )}
+              >
+                {done ? <Check className="h-4 w-4" /> : i + 1}
+              </div>
+              <span className={cn("text-[13px] font-medium", current ? "text-ink" : done ? "text-brand" : "text-muted-fg")}>
+                {label}
+              </span>
+              {i < ETAPAS.length - 1 && (
+                <div className={cn("mx-1 h-px w-10", done ? "bg-brand" : "bg-line")} />
+              )}
             </div>
-            <span className={`text-sm font-medium ${i === etapa ? "text-[#0f2744]" : i < etapa ? "text-[#f59e0b]" : "text-slate-400"}`}>
-              {label}
-            </span>
-            {i < ETAPAS.length - 1 && (
-              <div className={`w-12 h-px mx-1 ${i < etapa ? "bg-[#f59e0b]" : "bg-slate-200"}`} />
-            )}
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Etapa 1 — Dados */}
       {etapa === 0 && (
         <div className="max-w-xl">
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-semibold text-[#0f2744]">Informações do Projeto</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-[#0f2744]">Nome do Projeto *</Label>
-                <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex: Quadro Geral de Distribuição — Bloco A" className="h-10" />
+          <SectionHeading title="Informações do projeto" />
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-[13px] font-medium text-ink">Nome do projeto *</Label>
+              <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex: Quadro Geral de Distribuição — Bloco A" className="h-10" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[13px] font-medium text-ink">Cliente *</Label>
+              <Input value={cliente} onChange={(e) => setCliente(e.target.value)} placeholder="Ex: Construtora ABC" className="h-10" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[13px] font-medium text-ink">Descrição</Label>
+              <Input value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Detalhes adicionais (opcional)" className="h-10" />
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-[13px] font-medium text-ink">Margem de lucro</Label>
+                <span className="num text-[22px] font-medium text-ink">{margem}%</span>
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-[#0f2744]">Cliente *</Label>
-                <Input value={cliente} onChange={(e) => setCliente(e.target.value)} placeholder="Ex: Construtora ABC" className="h-10" />
+              <input
+                type="range" min={5} max={80} step={1}
+                value={margem}
+                onChange={(e) => setMargem(Number(e.target.value))}
+                className="w-full cursor-pointer"
+              />
+              <div className="num flex justify-between text-[11px] text-muted-fg">
+                <span>5%</span><span>40%</span><span>80%</span>
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-[#0f2744]">Descrição</Label>
-                <Input value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Detalhes adicionais (opcional)" className="h-10" />
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-medium text-[#0f2744]">Margem de Lucro</Label>
-                  <span className="text-2xl font-bold text-[#0f2744]">{margem}%</span>
-                </div>
-                <input
-                  type="range" min={5} max={80} step={1}
-                  value={margem}
-                  onChange={(e) => setMargem(Number(e.target.value))}
-                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-slate-200"
-                  style={{ accentColor: "#0f2744" }}
-                />
-                <div className="flex justify-between text-xs text-slate-400">
-                  <span>5%</span><span>40%</span><span>80%</span>
-                </div>
-              </div>
-              <Button
-                onClick={() => { if (!nome || !cliente) { toast.error("Preencha nome e cliente."); return } setEtapa(1) }}
-                className="w-full bg-[#0f2744] hover:bg-[#1a3a5c] text-white gap-2 mt-2"
-              >
-                Próximo <ArrowRight className="w-4 h-4" />
-              </Button>
-            </CardContent>
-          </Card>
+            </div>
+            <Button
+              onClick={() => { if (!nome || !cliente) { toast.error("Preencha nome e cliente."); return } setEtapa(1) }}
+              className="mt-1 w-full gap-2 bg-brand text-white hover:bg-brand-hover"
+            >
+              Próximo <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       )}
 
       {/* Etapa 2 — Quadros e Componentes */}
       {etapa === 1 && (
         <div className="flex gap-6">
-          <div className="flex-1 min-w-0 space-y-4">
+          <div className="min-w-0 flex-1 space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-slate-500">{quadros.length} quadro{quadros.length !== 1 ? "s" : ""} · {itens.length} insumo{itens.length !== 1 ? "s" : ""}</p>
-              <Button
-                onClick={adicionarQuadro}
-                variant="outline"
-                size="sm"
-                className="gap-1.5 border-[#0f2744]/30 text-[#0f2744] hover:bg-[#0f2744]/5"
-              >
-                <Plus className="w-3.5 h-3.5" /> Adicionar Quadro
+              <p className="num text-[13px] text-muted-fg">{quadros.length} quadro{quadros.length !== 1 ? "s" : ""} · {itens.length} insumo{itens.length !== 1 ? "s" : ""}</p>
+              <Button onClick={adicionarQuadro} variant="outline" size="sm" className="gap-1.5 border-line text-ink hover:bg-surface-2">
+                <Plus className="h-3.5 w-3.5" /> Adicionar quadro
               </Button>
             </div>
 
@@ -343,90 +341,89 @@ export default function NovoProjetoPage() {
               const subtotal = quadroItens.reduce((acc, i) => acc + i.quantidade * i.precoCustoUnitario, 0) * quadro.quantidade
 
               return (
-                <Card key={quadro.localId} className="border-0 shadow-sm">
-                  <CardHeader className="pb-3">
+                <div key={quadro.localId} className="rounded-lg border border-line">
+                  <div className="border-b border-line p-3">
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-[#0f2744]/10 flex-shrink-0">
-                        <LayoutGrid className="w-3.5 h-3.5 text-[#0f2744]" />
+                      <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-surface-2">
+                        <LayoutGrid className="h-3.5 w-3.5 text-ink-soft" />
                       </div>
                       <Input
                         value={quadro.nome}
                         onChange={(e) => handleQuadroNome(quadro.localId, e.target.value)}
                         placeholder={`Quadro ${qIdx + 1} (ex: QD Principal)`}
-                        className="h-9 flex-1 font-semibold text-[#0f2744] border-0 border-b border-slate-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-[#0f2744]"
+                        className="h-9 flex-1 rounded-none border-0 border-b border-line px-0 font-semibold text-ink focus-visible:border-brand focus-visible:ring-0"
                       />
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <span className="text-xs text-slate-400">Qtd:</span>
+                      <div className="flex flex-shrink-0 items-center gap-1.5">
+                        <span className="text-[12px] text-muted-fg">Qtd:</span>
                         <input
-                          type="number"
-                          min="1"
-                          step="1"
+                          type="number" min="1" step="1"
                           value={quadro.quantidadeStr}
                           onChange={(e) => handleQuadroQtyChange(quadro.localId, e.target.value)}
                           onBlur={() => handleQuadroQtyBlur(quadro.localId)}
-                          className="w-14 h-8 text-center text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-[#0f2744] bg-white"
+                          className={cn(inputMini, "num")}
                         />
                       </div>
                       {quadros.length > 1 && (
                         <button
                           onClick={() => removerQuadro(quadro.localId)}
-                          className="p-1.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0"
+                          className="flex-shrink-0 rounded-md p-1.5 text-muted-fg transition-colors hover:bg-surface-2 hover:text-destructive"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       )}
                     </div>
                     {subtotal > 0 && (
-                      <p className="text-xs text-slate-400 mt-1 ml-10">
+                      <p className="num ml-10 mt-1 text-[11px] text-muted-fg">
                         {quadroItens.length} insumo{quadroItens.length !== 1 ? "s" : ""} · subtotal {formatBRL(subtotal)}
                       </p>
                     )}
-                  </CardHeader>
-                  <CardContent className="space-y-3 pt-0">
+                  </div>
+
+                  <div className="space-y-3 p-3">
                     {/* Busca */}
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-fg" />
                       <Input
                         value={quadro.busca}
                         onChange={(e) => handleQuadroBusca(quadro.localId, e.target.value)}
-                        placeholder="Buscar insumo por nome, código ou fabricante..."
+                        placeholder="Buscar insumo por nome, código ou fabricante…"
                         className="h-10 pl-9 pr-9"
                       />
                       {carregandoCatalogo && (
-                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 animate-spin" />
+                        <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-fg" />
                       )}
                     </div>
 
                     {resultados.length > 0 && (
-                      <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 shadow-lg bg-white">
+                      <div className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface">
                         {resultados.map((comp) => (
                           <button
                             key={comp.id}
                             onClick={() => adicionarItem(comp, quadro.localId)}
-                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#f0f4f8] text-left transition-colors group"
+                            className="group flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-surface-2"
                           >
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-[#0f2744] truncate">{comp.descricao}</p>
-                              <p className="text-xs text-slate-400 mt-0.5">
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-[13px] font-medium text-ink">{comp.descricao}</p>
+                              <p className="num mt-0.5 text-[11px] text-muted-fg">
                                 {comp.codigoFabricante}
                                 {comp.fabricante && ` · ${comp.fabricante}`}
                                 {comp.categoria && ` · ${comp.categoria}`}
                               </p>
                             </div>
                             <div className="flex-shrink-0 text-right">
-                              <p className="text-sm font-semibold text-[#0f2744]">{formatBRL(comp.precoCusto)}</p>
-                              <p className="text-xs text-slate-400">{comp.unidadeMedida}</p>
+                              <p className="num text-[13px] font-medium text-ink">{formatBRL(comp.precoCusto)}</p>
+                              <p className="text-[11px] text-muted-fg">{comp.unidadeMedida}</p>
                             </div>
-                            <Plus className="w-4 h-4 text-[#f59e0b] flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <Plus className="h-4 w-4 flex-shrink-0 text-brand opacity-0 transition-opacity group-hover:opacity-100" />
                           </button>
                         ))}
                       </div>
                     )}
 
                     {quadro.busca.length >= 2 && resultados.length === 0 && !carregandoCatalogo && (
-                      <p className="text-sm text-slate-400 text-center py-2">
+                      <p className="py-2 text-center text-[13px] text-muted-fg">
                         Nenhum resultado para &quot;{quadro.busca}&quot;.{" "}
-                        <Link href="/insumos/novo" className="text-[#0f2744] font-medium hover:underline">
+                        <Link href="/insumos/novo" className="font-medium text-brand hover:underline">
                           Cadastrar novo
                         </Link>
                       </p>
@@ -434,47 +431,45 @@ export default function NovoProjetoPage() {
 
                     {/* Itens do quadro */}
                     {quadroItens.length > 0 && (
-                      <div className="overflow-x-auto border border-slate-100 rounded-xl">
+                      <div className="overflow-x-auto rounded-lg border border-line">
                         <table className="w-full">
                           <thead>
-                            <tr className="border-b border-slate-100 bg-slate-50/50">
-                              <th className="text-left px-4 py-2.5 text-xs font-semibold text-slate-400">Descrição</th>
-                              <th className="text-center px-3 py-2.5 text-xs font-semibold text-slate-400">Qtd</th>
-                              <th className="text-right px-3 py-2.5 text-xs font-semibold text-slate-400">Unit.</th>
-                              <th className="text-right px-3 py-2.5 text-xs font-semibold text-slate-400">Total</th>
-                              <th className="px-3 py-2.5" />
+                            <tr className="border-b border-line bg-surface-2">
+                              <th className="px-3 py-2 text-left text-[11px] font-medium text-muted-fg">Descrição</th>
+                              <th className="px-3 py-2 text-center text-[11px] font-medium text-muted-fg">Qtd</th>
+                              <th className="px-3 py-2 text-right text-[11px] font-medium text-muted-fg">Unit.</th>
+                              <th className="px-3 py-2 text-right text-[11px] font-medium text-muted-fg">Total</th>
+                              <th className="px-3 py-2" />
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-50">
+                          <tbody>
                             {quadroItens.map((item) => (
-                              <tr key={item.localId} className="hover:bg-slate-50/50">
-                                <td className="px-4 py-2.5">
-                                  <p className="text-sm font-medium text-[#0f2744] leading-snug">{item.descricao}</p>
-                                  <p className="text-xs text-slate-400 font-mono">{item.codigoFabricante}</p>
+                              <tr key={item.localId} className="border-t border-line hover:bg-surface-2">
+                                <td className="px-3 py-2.5">
+                                  <p className="text-[13px] font-medium leading-snug text-ink">{item.descricao}</p>
+                                  <p className="num text-[11px] text-muted-fg">{item.codigoFabricante}</p>
                                 </td>
                                 <td className="px-3 py-2.5 text-center">
                                   <input
-                                    type="number"
-                                    min="1"
-                                    step="1"
+                                    type="number" min="1" step="1"
                                     value={item.quantidadeStr}
                                     onChange={(e) => handleQtyChange(item.localId, e.target.value)}
                                     onBlur={() => handleQtyBlur(item.localId)}
-                                    className="w-16 h-8 text-center text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-[#0f2744] bg-white"
+                                    className={cn(inputMini, "num w-16")}
                                   />
                                 </td>
-                                <td className="px-3 py-2.5 text-right text-sm text-slate-600">
+                                <td className="num px-3 py-2.5 text-right text-[13px] text-muted-fg">
                                   {formatBRL(item.precoCustoUnitario)}
                                 </td>
-                                <td className="px-3 py-2.5 text-right text-sm font-semibold text-[#0f2744]">
+                                <td className="num px-3 py-2.5 text-right text-[13px] font-medium text-ink">
                                   {formatBRL(item.quantidade * item.precoCustoUnitario)}
                                 </td>
                                 <td className="px-3 py-2.5 text-center">
                                   <button
                                     onClick={() => removerItem(item.localId)}
-                                    className="p-1.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                                    className="rounded-md p-1.5 text-muted-fg transition-colors hover:bg-surface-2 hover:text-destructive"
                                   >
-                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <Trash2 className="h-3.5 w-3.5" />
                                   </button>
                                 </td>
                               </tr>
@@ -485,168 +480,146 @@ export default function NovoProjetoPage() {
                     )}
 
                     {quadroItens.length === 0 && (
-                      <p className="text-sm text-slate-400 text-center py-4 border border-dashed border-slate-200 rounded-xl">
+                      <p className="rounded-lg border border-dashed border-line py-4 text-center text-[13px] text-muted-fg">
                         Busque e adicione insumos acima
                       </p>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )
             })}
 
-            <div className="flex gap-3">
-              <Button onClick={() => setEtapa(0)} variant="outline" className="gap-2 border-slate-200 text-slate-600">
-                <ArrowLeft className="w-4 h-4" /> Voltar
+            <div className="flex gap-2">
+              <Button onClick={() => setEtapa(0)} variant="outline" className="gap-2 border-line text-ink-soft hover:bg-surface-2">
+                <ArrowLeft className="h-4 w-4" /> Voltar
               </Button>
               <Button
                 onClick={() => {
                   if (itens.length === 0) { toast.error("Adicione ao menos um insumo."); return }
                   setEtapa(2)
                 }}
-                className="flex-1 bg-[#0f2744] hover:bg-[#1a3a5c] text-white gap-2"
+                className="flex-1 gap-2 bg-brand text-white hover:bg-brand-hover"
               >
-                Próximo <ArrowRight className="w-4 h-4" />
+                Próximo <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          {/* Painel Lateral */}
-          <div className="w-72 flex-shrink-0 space-y-4">
-            <Card className="border-0 shadow-sm bg-[#0f2744] text-white sticky top-6">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2.5">
-                  <Image src="/kl-logo.png" alt="KL" width={26} height={26} className="rounded-lg flex-shrink-0" />
-                  <CardTitle className="text-sm text-white font-semibold">Precificação</CardTitle>
-                </div>
-                <p className="text-xs text-blue-200/60 mt-0.5">Margem: {margem}%</p>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="flex justify-between py-2 border-b border-white/10">
-                  <span className="text-blue-200/70">Custo Direto</span>
-                  <span className="font-semibold">{formatBRL(custoDireto)}</span>
+          {/* Painel lateral (escuro) */}
+          <div className="w-72 flex-shrink-0">
+            <div className="sticky top-2 overflow-hidden rounded-lg bg-dark text-white">
+              <div className="tech-grid pointer-events-none absolute inset-0" aria-hidden />
+              <div className="relative border-b border-white/[0.08] px-4 py-3.5">
+                <p className="text-[13px] font-semibold text-white">Precificação</p>
+                <p className="num mt-0.5 text-[12px] text-white/45">Margem {margem}%</p>
+              </div>
+              <div className="relative px-4 py-3 text-[13px]">
+                <div className="flex justify-between border-b border-white/[0.08] py-2">
+                  <span className="text-white/55">Custo direto</span>
+                  <span className="num font-medium text-white">{formatBRL(custoDireto)}</span>
                 </div>
                 {resultado && (
                   <>
-                    <div className="flex justify-between py-1.5">
-                      <span className="text-blue-200/60 text-xs">Custos Fixos ({formatPercent(dre?.pctCustoFixo ?? "0")})</span>
-                      <span className="text-xs">{formatBRL(resultado.custoFixoValor)}</span>
+                    {[
+                      { l: `Custos fixos (${formatPercent(dre?.pctCustoFixo ?? "0")})`, v: resultado.custoFixoValor },
+                      { l: `Impostos (${formatPercent(dre?.pctCustoVariavel ?? "0")})`, v: resultado.custoVariavelValor },
+                      { l: `Salários (${formatPercent(dre?.pctSalarios ?? "0")})`, v: resultado.salariosValor },
+                      { l: `Margem (${margem}%)`, v: resultado.margemValor },
+                    ].map((row) => (
+                      <div key={row.l} className="flex justify-between py-1.5">
+                        <span className="text-[11px] text-white/50">{row.l}</span>
+                        <span className="num text-[12px] text-white/85">{formatBRL(row.v)}</span>
+                      </div>
+                    ))}
+                    <div className="flex items-center justify-between border-t border-white/[0.08] py-2">
+                      <span className="text-[12px] font-medium text-brand-bright">Preço de venda</span>
+                      <span className="num text-[16px] font-medium text-brand-bright">{formatBRL(resultado.precoVenda)}</span>
                     </div>
-                    <div className="flex justify-between py-1.5">
-                      <span className="text-blue-200/60 text-xs">Impostos ({formatPercent(dre?.pctCustoVariavel ?? "0")})</span>
-                      <span className="text-xs">{formatBRL(resultado.custoVariavelValor)}</span>
+                    <div className="flex justify-between py-1">
+                      <span className="text-[11px] text-white/50">Markup</span>
+                      <span className="num text-[12px] text-white/80">{Number(resultado.markup).toFixed(4)}×</span>
                     </div>
-                    <div className="flex justify-between py-1.5">
-                      <span className="text-blue-200/60 text-xs">Salários ({formatPercent(dre?.pctSalarios ?? "0")})</span>
-                      <span className="text-xs">{formatBRL(resultado.salariosValor)}</span>
-                    </div>
-                    <div className="flex justify-between py-1.5 border-b border-white/10">
-                      <span className="text-blue-200/60 text-xs">Margem ({margem}%)</span>
-                      <span className="text-xs">{formatBRL(resultado.margemValor)}</span>
-                    </div>
-                    <div className="flex justify-between py-2">
-                      <span className="font-semibold text-[#f59e0b]">Preço de Venda</span>
-                      <span className="font-bold text-[#f59e0b] text-base">{formatBRL(resultado.precoVenda)}</span>
-                    </div>
-                    <div className="flex justify-between py-1.5 border-t border-white/10">
-                      <span className="text-blue-200/60 text-xs">Markup</span>
-                      <span className="font-semibold text-xs">{Number(resultado.markup).toFixed(4)}×</span>
-                    </div>
-                    </>
+                  </>
                 )}
                 {!dre && (
-                  <p className="text-xs text-red-300 text-center py-2">Nenhum DRE ativo. Configure em Parâmetros DRE.</p>
+                  <p className="py-2 text-center text-[12px]" style={{ color: "#E8896B" }}>
+                    Nenhum DRE ativo. Configure em Parâmetros DRE.
+                  </p>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* Etapa 3 — Resumo */}
       {etapa === 2 && resultado && (
-        <div className="max-w-2xl space-y-4">
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-semibold text-[#0f2744]">Resumo do Projeto</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div><span className="text-slate-500">Nome:</span> <span className="font-medium text-[#0f2744]">{nome}</span></div>
-                <div><span className="text-slate-500">Cliente:</span> <span className="font-medium text-[#0f2744]">{cliente}</span></div>
-                <div><span className="text-slate-500">Margem:</span> <span className="font-medium text-[#0f2744]">{margem}%</span></div>
-                <div><span className="text-slate-500">Quadros:</span> <span className="font-medium text-[#0f2744]">{quadros.length} · {itens.length} insumos</span></div>
-              </div>
+        <div className="max-w-2xl">
+          <SectionHeading title="Resumo do projeto" />
+          <div className="grid grid-cols-2 gap-y-2 text-[13px]">
+            <div><span className="text-muted-fg">Nome: </span><span className="font-medium text-ink">{nome}</span></div>
+            <div><span className="text-muted-fg">Cliente: </span><span className="font-medium text-ink">{cliente}</span></div>
+            <div><span className="text-muted-fg">Margem: </span><span className="num font-medium text-ink">{margem}%</span></div>
+            <div><span className="text-muted-fg">Quadros: </span><span className="num font-medium text-ink">{quadros.length} · {itens.length} insumos</span></div>
+          </div>
 
-              {/* Quadros e itens */}
-              <div className="space-y-2">
-                {quadros.map((q, idx) => {
-                  const qItens = itens.filter((i) => i.quadroLocalId === q.localId)
-                  return (
-                    <div key={q.localId} className="border border-slate-100 rounded-xl p-3">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2">
-                          <LayoutGrid className="w-3.5 h-3.5 text-[#0f2744]/60" />
-                          <span className="text-sm font-semibold text-[#0f2744]">
-                            {q.nome.trim() || `Quadro ${idx + 1}`}
-                          </span>
-                          {q.quantidade > 1 && (
-                            <span className="text-xs bg-[#f59e0b]/20 text-[#0f2744] px-1.5 py-0.5 rounded font-medium">
-                              ×{q.quantidade}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-xs text-slate-400">{qItens.length} insumo{qItens.length !== 1 ? "s" : ""}</span>
-                      </div>
-                      {qItens.length > 0 && (
-                        <p className="text-xs text-slate-500 ml-5.5">
-                          {qItens.map((i) => `${i.descricao.slice(0, 30)}${i.descricao.length > 30 ? "…" : ""} ×${i.quantidade}`).join(", ")}
-                        </p>
+          {/* Quadros e itens */}
+          <div className="mt-4 divide-y divide-line border-y border-line">
+            {quadros.map((q, idx) => {
+              const qItens = itens.filter((i) => i.quadroLocalId === q.localId)
+              return (
+                <div key={q.localId} className="py-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <LayoutGrid className="h-3.5 w-3.5 text-muted-fg" />
+                      <span className="text-[13px] font-medium text-ink">{q.nome.trim() || `Quadro ${idx + 1}`}</span>
+                      {q.quantidade > 1 && (
+                        <span className="num rounded bg-brand-bg px-1.5 py-0.5 text-[11px] font-medium text-brand">×{q.quantidade}</span>
                       )}
                     </div>
-                  )
-                })}
-              </div>
-
-              <Separator className="my-2" />
-
-              <div className="space-y-2 text-sm">
-                {[
-                  { label: "Custo Direto", value: formatBRL(resultado.custoDireto) },
-                  { label: "Custos Fixos", value: formatBRL(resultado.custoFixoValor) },
-                  { label: "Impostos", value: formatBRL(resultado.custoVariavelValor) },
-                  { label: "Salários", value: formatBRL(resultado.salariosValor) },
-                  { label: "Margem de Lucro", value: formatBRL(resultado.margemValor) },
-                ].map(({ label, value }) => (
-                  <div key={label} className="flex justify-between text-slate-600">
-                    <span>{label}</span><span>{value}</span>
+                    <span className="num text-[11px] text-muted-fg">{qItens.length} insumo{qItens.length !== 1 ? "s" : ""}</span>
                   </div>
-                ))}
-                <Separator />
-                <div className="flex justify-between font-bold text-[#0f2744] text-base">
-                  <span>Preço de Venda Final</span>
-                  <span className="text-[#f59e0b]">{formatBRL(resultado.precoVenda)}</span>
+                  {qItens.length > 0 && (
+                    <p className="num mt-1 pl-5 text-[11px] text-muted-fg">
+                      {qItens.map((i) => `${i.descricao.slice(0, 30)}${i.descricao.length > 30 ? "…" : ""} ×${i.quantidade}`).join(", ")}
+                    </p>
+                  )}
                 </div>
-                <div className="flex justify-between text-slate-500 text-xs">
-                  <span>Markup aplicado</span>
-                  <span>{Number(resultado.markup).toFixed(4)}×</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              )
+            })}
+          </div>
 
-          <div className="flex gap-3">
-            <Button onClick={() => setEtapa(1)} variant="outline" className="gap-2 border-slate-200 text-slate-600">
-              <ArrowLeft className="w-4 h-4" /> Voltar
+          <div className="mt-4 space-y-2 text-[13px]">
+            {[
+              { label: "Custo direto", value: formatBRL(resultado.custoDireto) },
+              { label: "Custos fixos", value: formatBRL(resultado.custoFixoValor) },
+              { label: "Impostos", value: formatBRL(resultado.custoVariavelValor) },
+              { label: "Salários", value: formatBRL(resultado.salariosValor) },
+              { label: "Margem de lucro", value: formatBRL(resultado.margemValor) },
+            ].map(({ label, value }) => (
+              <div key={label} className="flex justify-between text-ink-soft">
+                <span>{label}</span><span className="num">{value}</span>
+              </div>
+            ))}
+            <div className="flex justify-between border-t-2 border-line-strong pt-2.5 text-[15px] font-semibold text-ink">
+              <span>Preço de venda final</span>
+              <span className="num text-brand">{formatBRL(resultado.precoVenda)}</span>
+            </div>
+            <div className="num flex justify-between text-[12px] text-muted-fg">
+              <span>Markup aplicado</span>
+              <span>{Number(resultado.markup).toFixed(4)}×</span>
+            </div>
+          </div>
+
+          <div className="mt-6 flex gap-2">
+            <Button onClick={() => setEtapa(1)} variant="outline" className="gap-2 border-line text-ink-soft hover:bg-surface-2">
+              <ArrowLeft className="h-4 w-4" /> Voltar
             </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="flex-1 bg-[#0f2744] hover:bg-[#1a3a5c] text-white gap-2"
-            >
+            <Button onClick={handleSubmit} disabled={loading} className="flex-1 gap-2 bg-brand text-white hover:bg-brand-hover">
               {loading ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</>
+                <><Loader2 className="h-4 w-4 animate-spin" /> Salvando…</>
               ) : (
-                <><Save className="w-4 h-4" /> Salvar como Rascunho</>
+                <><Save className="h-4 w-4" /> Salvar como rascunho</>
               )}
             </Button>
           </div>

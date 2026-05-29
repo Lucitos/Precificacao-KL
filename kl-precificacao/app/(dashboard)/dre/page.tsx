@@ -28,9 +28,9 @@ export default async function DREPage() {
         subtitle="Demonstração de Resultado do Exercício — base de cálculo de todos os projetos"
       />
 
-      <div className="grid grid-cols-1 gap-x-10 gap-y-10 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-x-8 gap-y-7 xl:grid-cols-3">
         {/* DRE ativa + histórico */}
-        <div className="space-y-10 xl:col-span-2">
+        <div className="space-y-7 xl:col-span-2">
           {ativo && (
             <section>
               <SectionHeading

@@ -146,7 +146,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
             <DropdownMenuItem
               onClick={handleEmitir}
               disabled={loadingAction === "emitir"}
-              className="text-green-700 focus:text-green-700"
+              className="text-[#2E7D52] focus:text-[#2E7D52]"
             >
               {loadingAction === "emitir"
                 ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -159,7 +159,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
             <DropdownMenuItem
               onClick={handleVendido}
               disabled={loadingAction === "vendido"}
-              className="text-blue-700 focus:text-blue-700"
+              className="text-[#2B6BBF] focus:text-[#2B6BBF]"
             >
               {loadingAction === "vendido"
                 ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -170,7 +170,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
 
           <DropdownMenuItem
             onClick={() => toast.info("Geração de relatório em breve.")}
-            className="text-slate-600"
+            className="text-ink-soft"
           >
             <FileText className="w-4 h-4 mr-2" />
             Gerar Relatório PDF
@@ -179,7 +179,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
           <DropdownMenuItem
             onSelect={(e) => e.preventDefault()}
             onClick={() => setDiscountOpen(true)}
-            className="text-slate-600"
+            className="text-ink-soft"
           >
             <Tag className="w-4 h-4 mr-2" />
             Descontos
@@ -196,10 +196,10 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
               <DropdownMenuItem
                 onSelect={(e) => e.preventDefault()}
                 onClick={() => setDeleteOpen(true)}
-                className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                className="text-destructive focus:text-destructive focus:bg-surface-2"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                Deletar Projeto
+                Deletar projeto
               </DropdownMenuItem>
             </>
           )}
@@ -266,7 +266,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
                   className="h-10 pr-7"
                   autoFocus
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">%</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-fg">%</span>
               </div>
             </div>
 
@@ -289,7 +289,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
                 variant="outline"
                 onClick={() => salvar(null)}
                 disabled={saving}
-                className="mr-auto text-red-600 border-red-200 hover:bg-red-50 text-xs"
+                className="mr-auto border-line text-destructive hover:bg-surface-2 text-xs"
               >
                 Remover Desconto
               </Button>

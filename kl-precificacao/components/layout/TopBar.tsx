@@ -25,8 +25,8 @@ export function TopBar({ userName, userRole, dreExercicio, dreSummary }: TopBarP
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-paper/85 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-[1180px] items-center gap-5 px-9">
+    <header className="z-30 flex-shrink-0 border-b border-line bg-paper">
+      <div className="mx-auto flex h-14 max-w-[1180px] items-center gap-5 px-8">
         {/* Marca */}
         <Link href="/" className="flex flex-shrink-0 items-center gap-2.5">
           <Image src="/kl-logo.png" alt="KL Engenharia" width={28} height={28} className="rounded-md" />
