@@ -207,6 +207,17 @@ export async function aplicarDesconto(id: string, desconto: number | null) {
   return { success: true }
 }
 
+export async function deletarProjeto(id: string) {
+  const session = await getSession()
+  if (session?.role !== "ADMIN") return { error: "Sem permissão." }
+
+  await prisma.projeto.delete({ where: { id } })
+
+  revalidatePath("/projetos")
+  revalidatePath("/")
+  return { success: true }
+}
+
 export async function cancelarProjeto(id: string) {
   const session = await getSession()
   if (session?.role !== "ADMIN") return { error: "Sem permissão." }

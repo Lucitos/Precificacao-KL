@@ -78,7 +78,7 @@ function DonutChart({ data }: { data: { label: string; value: number; color: str
   )
 }
 
-export default function ProjetosClientPage({ projetos }: { projetos: Projeto[] }) {
+export default function ProjetosClientPage({ projetos, userRole }: { projetos: Projeto[]; userRole: string }) {
   const [busca, setBusca] = useState("")
   const [filtro, setFiltro] = useState<typeof STATUS_OPTS[number]>("TODOS")
   const tableRef = useRef<HTMLDivElement>(null)
@@ -300,6 +300,8 @@ export default function ProjetosClientPage({ projetos }: { projetos: Projeto[] }
                           status={p.status}
                           precoVenda={p.precoVendaTotal.toString()}
                           desconto={p.desconto ? Number(p.desconto) : null}
+                          userRole={userRole}
+                          nomeProjeto={p.nome}
                         />
                       </td>
                     </tr>

@@ -20,20 +20,23 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { aplicarDesconto, emitirProjeto, marcarVendido } from "@/actions/projetos"
+import { aplicarDesconto, emitirProjeto, marcarVendido, deletarProjeto } from "@/actions/projetos"
 import { formatBRL } from "@/lib/markup"
-import { MoreHorizontal, ExternalLink, Pencil, FileText, Tag, Loader2, SendHorizonal, ShoppingCart } from "lucide-react"
+import { MoreHorizontal, ExternalLink, Pencil, FileText, Tag, Loader2, SendHorizonal, ShoppingCart, Trash2 } from "lucide-react"
 
 interface Props {
   id: string
   status: string
   precoVenda: string
   desconto: number | null
+  userRole: string
+  nomeProjeto: string
 }
 
-export default function ProjetoActionsDropdown({ id, status, precoVenda, desconto }: Props) {
+export default function ProjetoActionsDropdown({ id, status, precoVenda, desconto, userRole, nomeProjeto }: Props) {
   const router = useRouter()
   const [discountOpen, setDiscountOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [pct, setPct] = useState("")
   const [saving, setSaving] = useState(false)
   const [loadingAction, setLoadingAction] = useState<string | null>(null)
@@ -96,6 +99,19 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
       else { toast.success("Projeto marcado como vendido!"); router.refresh() }
     } catch {
       toast.error("Erro ao marcar como vendido.")
+    } finally {
+      setLoadingAction(null)
+    }
+  }
+
+  const handleDeletar = async () => {
+    setLoadingAction("deletar")
+    try {
+      const result = await deletarProjeto(id)
+      if (result?.error) toast.error(result.error)
+      else { toast.success("Projeto deletado."); setDeleteOpen(false); router.refresh() }
+    } catch {
+      toast.error("Erro ao deletar projeto.")
     } finally {
       setLoadingAction(null)
     }
@@ -173,8 +189,56 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
               </span>
             )}
           </DropdownMenuItem>
+
+          {userRole === "ADMIN" && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                onClick={() => setDeleteOpen(true)}
+                className="text-red-600 focus:text-red-600 focus:bg-red-50"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Deletar Projeto
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-red-600">Deletar Projeto</DialogTitle>
+          </DialogHeader>
+          <div className="py-2">
+            <p className="text-sm text-slate-600">
+              Tem certeza que deseja deletar o projeto{" "}
+              <span className="font-semibold text-slate-800">{nomeProjeto}</span>?
+            </p>
+            <p className="text-xs text-slate-400 mt-2">
+              Esta ação é irreversível. Todos os itens e quadros associados serão removidos.
+            </p>
+          </div>
+          <DialogFooter className="flex-row items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteOpen(false)}
+              disabled={loadingAction === "deletar"}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleDeletar}
+              disabled={loadingAction === "deletar"}
+              className="bg-red-600 hover:bg-red-700 text-white gap-2"
+            >
+              {loadingAction === "deletar" && <Loader2 className="w-4 h-4 animate-spin" />}
+              Deletar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={discountOpen} onOpenChange={setDiscountOpen}>
         <DialogContent className="sm:max-w-sm">

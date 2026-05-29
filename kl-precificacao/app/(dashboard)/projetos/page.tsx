@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/db"
+import { getSession } from "@/lib/session"
 import { Header } from "@/components/layout/Header"
 import Link from "next/link"
-import { formatBRL } from "@/lib/markup"
 import ProjetosClientPage from "@/components/projetos/ProjetosClientPage"
 
 export default async function ProjetosPage() {
+  const session = await getSession()
   const projetos = await prisma.projeto.findMany({
     orderBy: { criadoEm: "desc" },
     include: {
@@ -31,7 +32,7 @@ export default async function ProjetosPage() {
           </Link>
         }
       />
-      <ProjetosClientPage projetos={projetos} />
+      <ProjetosClientPage projetos={projetos} userRole={session?.role ?? ""} />
     </div>
   )
 }
