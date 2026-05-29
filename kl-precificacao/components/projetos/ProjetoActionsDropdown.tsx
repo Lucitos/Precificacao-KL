@@ -124,7 +124,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-slate-400 hover:text-[#0f2744] hover:bg-slate-100"
+            className="h-8 w-8 text-muted-fg hover:bg-surface-2 hover:text-ink"
           >
             <MoreHorizontal className="w-4 h-4" />
           </Button>
@@ -184,7 +184,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
             <Tag className="w-4 h-4 mr-2" />
             Descontos
             {desconto !== null && (
-              <span className="ml-auto text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium">
+              <span className="num ml-auto rounded bg-brand-bg px-1.5 py-0.5 text-xs font-medium text-brand">
                 {desconto}%
               </span>
             )}
@@ -243,17 +243,17 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
       <Dialog open={discountOpen} onOpenChange={setDiscountOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-[#0f2744]">Aplicar Desconto</DialogTitle>
+            <DialogTitle className="text-ink">Aplicar desconto</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
-            <div className="bg-[#f0f4f8] rounded-xl p-4">
-              <p className="text-xs text-slate-500 mb-1">Preço de Venda Base</p>
-              <p className="text-xl font-bold text-[#0f2744]">{formatBRL(precoVenda)}</p>
+            <div className="rounded-lg bg-surface-2 p-4">
+              <p className="mb-1 text-xs text-muted-fg">Preço de venda base</p>
+              <p className="num text-xl font-medium text-ink">{formatBRL(precoVenda)}</p>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-[#0f2744]">Desconto (%)</Label>
+              <Label className="text-sm font-medium text-ink">Desconto (%)</Label>
               <div className="relative">
                 <Input
                   type="number"
@@ -271,12 +271,12 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
             </div>
 
             {precoComDesconto !== null && valorDesconto !== null && (
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-1">
-                <p className="text-xs text-slate-500">Preço com Desconto</p>
-                <p className="text-2xl font-bold text-green-700">
+              <div className="space-y-1 rounded-lg border border-line bg-surface-2 p-4">
+                <p className="text-xs text-muted-fg">Preço com desconto</p>
+                <p className="num text-2xl font-medium" style={{ color: "#2E7D52" }}>
                   {formatBRL(precoComDesconto.toFixed(2))}
                 </p>
-                <p className="text-xs text-slate-400">
+                <p className="num text-xs text-muted-fg">
                   Redução de {formatBRL(valorDesconto.toFixed(2))}
                 </p>
               </div>
@@ -304,7 +304,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
             <Button
               onClick={() => salvar(pctNum)}
               disabled={saving}
-              className="bg-[#0f2744] hover:bg-[#1a3a5c] text-white gap-2"
+              className="gap-2 bg-brand text-white hover:bg-brand-hover"
             >
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}
               Aplicar

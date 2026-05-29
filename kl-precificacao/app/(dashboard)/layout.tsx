@@ -14,15 +14,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
     : undefined
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "#F8F7F4" }}>
+    <div className="flex h-screen overflow-hidden bg-paper">
       <Sidebar
         userName={session.name}
         userRole={session.role}
         dreExercicio={dreExercicio}
         dreSummary={dreSummary}
       />
-      <main className="flex-1 overflow-y-auto" style={{ background: "#F8F7F4" }}>
-        <div className="max-w-7xl mx-auto px-10 py-8">{children}</div>
+      <main className="flex-1 overflow-y-auto bg-paper">
+        <div className="mx-auto max-w-[1180px] px-9 py-8">{children}</div>
       </main>
     </div>
   )

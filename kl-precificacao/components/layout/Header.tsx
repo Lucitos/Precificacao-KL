@@ -7,23 +7,17 @@ interface HeaderProps {
 
 export function Header({ title, subtitle, eyebrow, actions }: HeaderProps) {
   return (
-    <div className="flex items-start justify-between mb-7 gap-4">
-      <div>
+    <div className="mb-7 flex items-end justify-between gap-4 border-b border-line pb-5">
+      <div className="min-w-0">
         {eyebrow && (
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-1.5" style={{ color: "#E87722" }}>
-            {eyebrow}
-          </p>
+          <p className="mb-1.5 text-[12px] font-medium text-muted-fg">{eyebrow}</p>
         )}
-        <h1 className="text-[26px] font-extrabold leading-[1.15] tracking-[-0.02em]" style={{ color: "#1C2B30" }}>
+        <h1 className="text-[27px] font-semibold leading-[1.1] tracking-[-0.025em] text-ink">
           {title}
         </h1>
-        {subtitle && (
-          <p className="text-[13px] mt-1" style={{ color: "#5F7177" }}>
-            {subtitle}
-          </p>
-        )}
+        {subtitle && <p className="mt-1.5 text-[13px] text-ink-soft">{subtitle}</p>}
       </div>
-      {actions && <div className="flex items-center gap-2 flex-shrink-0">{actions}</div>}
+      {actions && <div className="flex flex-shrink-0 items-center gap-2">{actions}</div>}
     </div>
   )
 }

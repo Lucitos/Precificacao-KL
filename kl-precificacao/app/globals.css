@@ -1,72 +1,129 @@
 @import "tailwindcss";
 
 :root {
-  --kl-orange: #E87722;
-  --kl-orange-bright: #F5A623;
-  --kl-orange-hover: #D4660F;
-  --kl-orange-bg: #FEF3E9;
-  --kl-dark: #071D27;
-  --kl-dark-2: #0A2530;
-  --kl-text: #1C2B30;
-  --kl-text-2: #5F7177;
-  --kl-muted: #9AABAE;
-  --kl-bg: #F8F7F4;
-  --kl-surface: #ffffff;
-  --kl-border: rgba(0,0,0,0.08);
-  --kl-border-strong: rgba(0,0,0,0.12);
+  /* ── Marca KL ─────────────────────────────── */
+  --kl-orange: #DA6A1E;          /* laranja levemente mais terroso, menos "neon" */
+  --kl-orange-bright: #F2A03C;
+  --kl-orange-hover: #BF581A;
+  --kl-orange-bg: #FBEFE2;
+  --kl-dark: #08222C;
+  --kl-dark-2: #0C2B36;
+
+  /* ── Neutros (tom tinta-teal, não cinza puro) ─ */
+  --paper: #F6F4EF;              /* fundo papel quente */
+  --surface: #FFFFFF;
+  --surface-2: #FAF8F3;          /* superfície tonal p/ seções */
+  --ink: #16242A;                /* títulos */
+  --ink-soft: #46585E;           /* corpo */
+  --muted: #8B989C;              /* legendas / rótulos */
+  --line: rgba(8, 34, 44, 0.10); /* hairline padrão */
+  --line-strong: rgba(8, 34, 44, 0.16);
+
+  /* compat. com nomes antigos usados no código */
+  --kl-orange-bg-compat: var(--kl-orange-bg);
+  --kl-text: var(--ink);
+  --kl-text-2: var(--ink-soft);
+  --kl-muted: var(--muted);
+  --kl-bg: var(--paper);
+  --kl-surface: var(--surface);
+  --kl-border: var(--line);
+  --kl-border-strong: var(--line-strong);
+
+  --radius: 0.5rem;
 }
 
 @theme inline {
-  --color-background: var(--kl-bg);
-  --color-foreground: var(--kl-text);
-  --font-sans: var(--font-montserrat), system-ui, sans-serif;
-  --font-mono: monospace;
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, "SFMono-Regular", monospace;
 
-  --color-kl-orange: #E87722;
-  --color-kl-orange-bright: #F5A623;
-  --color-kl-orange-bg: #FEF3E9;
-  --color-kl-dark: #071D27;
-  --color-kl-dark-2: #0A2530;
-  --color-kl-text: #1C2B30;
-  --color-kl-text-2: #5F7177;
-  --color-kl-muted: #9AABAE;
-  --color-kl-bg: #F8F7F4;
-  --color-kl-surface: #ffffff;
+  /* tokens editoriais (geram utilidades: bg-paper, text-ink, border-line…) */
+  --color-paper: var(--paper);
+  --color-bg: var(--paper);
+  --color-fg: var(--ink);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted-fg: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
 
-  --color-border: rgba(0,0,0,0.08);
-  --color-input: rgba(0,0,0,0.08);
-  --color-ring: #E87722;
-  --color-background: #F8F7F4;
-  --color-foreground: #1C2B30;
-  --color-primary: #E87722;
+  --color-brand: var(--kl-orange);
+  --color-brand-bright: var(--kl-orange-bright);
+  --color-brand-hover: var(--kl-orange-hover);
+  --color-brand-bg: var(--kl-orange-bg);
+  --color-dark: var(--kl-dark);
+  --color-dark-2: var(--kl-dark-2);
+
+  /* aliases legados (telas ainda não migradas continuam funcionando) */
+  --color-kl-orange: var(--kl-orange);
+  --color-kl-orange-bright: var(--kl-orange-bright);
+  --color-kl-orange-bg: var(--kl-orange-bg);
+  --color-kl-dark: var(--kl-dark);
+  --color-kl-dark-2: var(--kl-dark-2);
+  --color-kl-text: var(--ink);
+  --color-kl-text-2: var(--ink-soft);
+  --color-kl-muted: var(--muted);
+  --color-kl-bg: var(--paper);
+  --color-kl-surface: var(--surface);
+
+  /* shadcn / radix */
+  --color-border: var(--line);
+  --color-input: var(--line-strong);
+  --color-ring: var(--kl-orange);
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-primary: var(--kl-orange);
   --color-primary-foreground: #ffffff;
-  --color-secondary: #F8F7F4;
-  --color-secondary-foreground: #1C2B30;
-  --color-destructive: #DC2626;
-  --color-muted: #F8F7F4;
-  --color-muted-foreground: #9AABAE;
-  --color-accent: #E87722;
-  --color-accent-foreground: #ffffff;
-  --color-popover: #ffffff;
-  --color-popover-foreground: #1C2B30;
-  --color-card: #ffffff;
-  --color-card-foreground: #1C2B30;
-  --radius: 0.75rem;
+  --color-secondary: var(--surface-2);
+  --color-secondary-foreground: var(--ink);
+  --color-destructive: #C2410C;
+  --color-muted: var(--surface-2);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--surface-2);
+  --color-accent-foreground: var(--ink);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --radius: 0.5rem;
 }
 
 * { box-sizing: border-box; }
 
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
 body {
-  background: var(--kl-bg);
-  color: var(--kl-text);
-  font-family: var(--font-montserrat), system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv01", "cv03", "ss03";
+  letter-spacing: -0.011em;
 }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
+/* Numerais: monoespaçado tabular — usado em todo valor, %, markup, margem */
+.num {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "zero";
+  letter-spacing: -0.02em;
+}
+
+/* Régua editorial: hairline horizontal de seção */
+.rule { border-top: 1px solid var(--line); }
+
+/* Grade técnica sutil (pistas de engenharia) p/ áreas escuras */
+.tech-grid {
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(8,34,44,0.18); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(8,34,44,0.3); }
 
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
@@ -77,19 +134,19 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
-  height: 4px;
+  height: 3px;
   border-radius: 2px;
-  background: rgba(0,0,0,0.1);
+  background: var(--line-strong);
   outline: none;
   cursor: pointer;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: var(--kl-orange);
   border: 2.5px solid #fff;
   cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 1px 3px rgba(8,34,44,0.25);
 }
