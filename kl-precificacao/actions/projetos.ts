@@ -84,16 +84,16 @@ export async function criarProjeto(
     const quadro = await prisma.quadro.create({
       data: { projetoId: projeto.id, nome: q.nome, quantidade: q.quantidade, ordem: q.ordem },
     })
-    if (q.itens.length > 0) {
-      await prisma.itemOrcamento.createMany({
-        data: q.itens.map((item) => ({
+    for (const item of q.itens) {
+      await prisma.itemOrcamento.create({
+        data: {
           projetoId: projeto.id,
           quadroId: quadro.id,
           componenteId: item.componenteId,
           quantidade: item.quantidade.toString(),
           precoCustoUnitario: item.precoCustoUnitario.toString(),
           precoCustoTotal: (item.quantidade * item.precoCustoUnitario).toFixed(2),
-        })),
+        },
       })
     }
   }
@@ -166,16 +166,16 @@ export async function atualizarProjeto(
     const quadro = await prisma.quadro.create({
       data: { projetoId: id, nome: q.nome, quantidade: q.quantidade, ordem: q.ordem },
     })
-    if (q.itens.length > 0) {
-      await prisma.itemOrcamento.createMany({
-        data: q.itens.map((item) => ({
+    for (const item of q.itens) {
+      await prisma.itemOrcamento.create({
+        data: {
           projetoId: id,
           quadroId: quadro.id,
           componenteId: item.componenteId,
           quantidade: item.quantidade.toString(),
           precoCustoUnitario: item.precoCustoUnitario.toString(),
           precoCustoTotal: (item.quantidade * item.precoCustoUnitario).toFixed(2),
-        })),
+        },
       })
     }
   }
@@ -298,19 +298,17 @@ export async function duplicarProjeto(id: string) {
     const quadro = await prisma.quadro.create({
       data: { projetoId: novo.id, nome: q.nome, quantidade: q.quantidade, ordem: q.ordem },
     })
-    if (q.itens.length > 0) {
-      await prisma.itemOrcamento.createMany({
-        data: q.itens.map((item: ItemIncluded) => {
-          const precoAtual = item.componente.precos[0]?.precoCusto ?? item.precoCustoUnitario
-          return {
-            projetoId: novo.id,
-            quadroId: quadro.id,
-            componenteId: item.componenteId,
-            quantidade: item.quantidade.toString(),
-            precoCustoUnitario: precoAtual.toString(),
-            precoCustoTotal: (Number(item.quantidade) * Number(precoAtual)).toFixed(2),
-          }
-        }),
+    for (const item of q.itens) {
+      const precoAtual = (item as ItemIncluded).componente.precos[0]?.precoCusto ?? item.precoCustoUnitario
+      await prisma.itemOrcamento.create({
+        data: {
+          projetoId: novo.id,
+          quadroId: quadro.id,
+          componenteId: item.componenteId,
+          quantidade: item.quantidade.toString(),
+          precoCustoUnitario: precoAtual.toString(),
+          precoCustoTotal: (Number(item.quantidade) * Number(precoAtual)).toFixed(2),
+        },
       })
     }
   }
