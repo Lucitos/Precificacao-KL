@@ -1,11 +1,12 @@
 import type { Metadata } from "next"
-import { Geist } from "next/font/google"
+import { Montserrat } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 })
 
 export const metadata: Metadata = {
@@ -15,8 +16,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${geistSans.variable} h-full`}>
-      <body className="h-full antialiased bg-[#f0f4f8] text-[#0f172a]">
+    <html lang="pt-BR" className={`${montserrat.variable} h-full`}>
+      <body className="h-full antialiased bg-[#F8F7F4] text-[#1C2B30]">
         {children}
         <Toaster richColors position="top-right" />
       </body>
