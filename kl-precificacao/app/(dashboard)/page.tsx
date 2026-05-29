@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { SectionHeading } from "@/components/ui/section"
 import { Stat } from "@/components/ui/stat"
 import { StatusBadge } from "@/components/ui/status-badge"
+import { MonthBarChart } from "@/components/ui/month-bar-chart"
 
 export default async function DashboardPage() {
   const session = await getSession()
@@ -262,27 +263,58 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Indicadores mensais — numéricos + sparkline, sobre o papel */}
+      {/* Indicadores mensais — gráfico mês a mês */}
       <section className="mt-7">
         <SectionHeading
           title="Indicadores mensais"
           action={<span className="num text-[12px] text-muted-fg">{periodoLabel}</span>}
         />
-        <div className="grid grid-cols-3">
+        <div className="grid grid-cols-3 border-t border-line">
           {[
-            { label: "Projetos criados", value: totalCriados, sub: "total no período", spark: dadosMensais.map((d) => d.criados), color: "var(--kl-orange)" },
-            { label: "Valor emitido", value: formatBRL(totalEmitido6m), sub: "total no período", spark: dadosMensais.map((d) => d.valorEmitido), color: "#2E7D52" },
-            { label: "Markup médio", value: markupMedio6m > 0 ? `${markupMedio6m.toFixed(3)}×` : "—", sub: "média do período", spark: dadosMensais.map((d) => d.markupMedio), color: "#2B6BBF" },
+            {
+              label: "Projetos criados",
+              value: totalCriados,
+              sub: "total no período",
+              color: "var(--kl-orange)",
+              kind: "count" as const,
+              chart: dadosMensais.map((d) => ({ mes: d.mes, value: d.criados })),
+            },
+            {
+              label: "Valor emitido",
+              value: formatBRL(totalEmitido6m),
+              sub: "total no período",
+              color: "#2E7D52",
+              kind: "currency" as const,
+              chart: dadosMensais.map((d) => ({ mes: d.mes, value: d.valorEmitido })),
+            },
+            {
+              label: "Markup médio",
+              value: markupMedio6m > 0 ? `${markupMedio6m.toFixed(3)}×` : "—",
+              sub: "média do período",
+              color: "#2B6BBF",
+              kind: "multiplier" as const,
+              chart: dadosMensais.map((d) => ({ mes: d.mes, value: d.markupMedio })),
+            },
           ].map((ind, i) => (
             <div
               key={ind.label}
               className={cn(
-                "py-1",
+                "pt-4 pb-3",
                 i !== 2 && "border-r border-line",
                 i === 0 ? "pr-6" : i === 2 ? "pl-6" : "px-6"
               )}
             >
-              <Stat label={ind.label} value={ind.value} sub={ind.sub} spark={ind.spark} sparkColor={ind.color} />
+              <p className="text-[12px] font-medium text-muted-fg">{ind.label}</p>
+              <p className="num mt-2 text-[28px] font-medium leading-none tracking-[-0.03em] text-ink">
+                {ind.value}
+              </p>
+              <p className="mt-1.5 text-[12px] text-muted-fg">{ind.sub}</p>
+              <MonthBarChart
+                data={ind.chart}
+                color={ind.color}
+                kind={ind.kind}
+                className="mt-4"
+              />
             </div>
           ))}
         </div>
