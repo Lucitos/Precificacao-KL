@@ -229,8 +229,11 @@ export default function NovoProjetoPage() {
         toast.error(result.error)
       } else {
         toast.success("Rascunho salvo com sucesso!")
-        router.push(`/projetos/${result.id}`)
+        router.push("/projetos")
       }
+    } catch (err) {
+      toast.error("Erro ao salvar projeto. Tente novamente.")
+      console.error(err)
     } finally {
       setLoading(false)
     }
