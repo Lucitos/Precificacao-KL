@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db"
 import { getSession } from "@/lib/session"
 import { calcularPrecificacao } from "@/lib/markup"
 import { gerarNumeroReferencia } from "@/lib/utils"
+import { registrarLog } from "@/lib/audit"
 
 type ItemIncluded = {
   componenteId: string
@@ -234,6 +235,13 @@ export async function emitirProjeto(id: string) {
     data: { status: "EMITIDO", emitidoEm: new Date() },
   })
 
+  await registrarLog({
+    acao: "PROJETO_EMITIDO",
+    entidade: "Projeto",
+    entidadeId: id,
+    descricao: `Projeto ${projeto.numeroReferencia} — ${projeto.nome} emitido`,
+  })
+
   revalidatePath("/projetos")
   revalidatePath(`/projetos/${id}`)
   revalidatePath("/")
@@ -251,6 +259,13 @@ export async function marcarVendido(id: string) {
   await prisma.projeto.update({
     where: { id },
     data: { status: "VENDIDO", vendidoEm: new Date() },
+  })
+
+  await registrarLog({
+    acao: "PROJETO_VENDIDO",
+    entidade: "Projeto",
+    entidadeId: id,
+    descricao: `Projeto ${projeto.numeroReferencia} — ${projeto.nome} marcado como vendido`,
   })
 
   revalidatePath("/projetos")

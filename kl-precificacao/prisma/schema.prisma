@@ -110,3 +110,18 @@ model ItemOrcamento {
   precoCustoTotal    Decimal    @db.Decimal(16, 2)
   observacao         String?
 }
+
+model LogAuditoria {
+  id          String   @id @default(cuid())
+  usuarioId   String?
+  usuarioNome String
+  acao        String
+  entidade    String
+  entidadeId  String?
+  descricao   String
+  metadata    Json?
+  criadoEm    DateTime @default(now())
+
+  @@index([entidade, criadoEm])
+  @@index([criadoEm])
+}

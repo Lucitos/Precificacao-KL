@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/db"
 import { getSession } from "@/lib/session"
+import { registrarLog } from "@/lib/audit"
 
 export async function criarDRE(formData: FormData) {
   const session = await getSession()
@@ -18,7 +19,7 @@ export async function criarDRE(formData: FormData) {
     return { error: "Preencha todos os campos obrigatórios." }
   }
 
-  await prisma.dREParametros.create({
+  const dre = await prisma.dREParametros.create({
     data: {
       exercicio,
       pctCustoFixo: (Number(pctCustoFixo) / 100).toString(),
@@ -27,6 +28,13 @@ export async function criarDRE(formData: FormData) {
       faturamentoEstimado: faturamento || null,
       ativo: false,
     },
+  })
+
+  await registrarLog({
+    acao: "DRE_CRIADA",
+    entidade: "DRE",
+    entidadeId: dre.id,
+    descricao: `Parâmetros DRE criados para o exercício ${exercicio}`,
   })
 
   revalidatePath("/dre")
@@ -41,6 +49,13 @@ export async function ativarDRE(id: string) {
     prisma.dREParametros.updateMany({ where: { ativo: true }, data: { ativo: false } }),
     prisma.dREParametros.update({ where: { id }, data: { ativo: true } }),
   ])
+
+  await registrarLog({
+    acao: "DRE_ATIVADA",
+    entidade: "DRE",
+    entidadeId: id,
+    descricao: "Parâmetros DRE ativados",
+  })
 
   revalidatePath("/dre")
   return { success: true }

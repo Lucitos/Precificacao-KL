@@ -5,13 +5,14 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { UserMenu } from "./UserMenu"
-import { LayoutDashboard, FolderOpen, Package, BarChart3 } from "lucide-react"
+import { LayoutDashboard, FolderOpen, Package, BarChart3, ScrollText } from "lucide-react"
 
 const navItems = [
   { href: "/", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/projetos", icon: FolderOpen, label: "Projetos" },
   { href: "/insumos", icon: Package, label: "Insumos" },
   { href: "/dre", icon: BarChart3, label: "Parâmetros DRE" },
+  { href: "/auditoria", icon: ScrollText, label: "Auditoria" },
 ]
 
 interface TopBarProps {

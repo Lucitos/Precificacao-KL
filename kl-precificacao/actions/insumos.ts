@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/db"
+import { registrarLog } from "@/lib/audit"
+import { formatBRL } from "@/lib/markup"
 
 export async function criarInsumo(
   _prevState: { error: string; success?: boolean; id?: string },
@@ -54,6 +56,14 @@ export async function atualizarPreco(componenteId: string, novoPreco: string) {
       },
     }),
   ])
+
+  await registrarLog({
+    acao: "PRECO_ALTERADO",
+    entidade: "Componente",
+    entidadeId: componenteId,
+    descricao: `Preço alterado para ${formatBRL(novoPreco)}`,
+    metadata: { novoPreco },
+  })
 
   revalidatePath("/insumos")
   return { success: true }
