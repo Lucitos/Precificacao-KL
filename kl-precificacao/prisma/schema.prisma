@@ -13,6 +13,7 @@ model User {
   password  String
   role      Role      @default(ORCAMENTISTA)
   projetos  Projeto[]
+  propostas Proposta[]
   criadoEm DateTime  @default(now())
 }
 
@@ -74,6 +75,7 @@ model Projeto {
   itens            ItemOrcamento[]
   quadros          Quadro[]
   cenarios         CenarioProjeto[]
+  propostas        Proposta[]
   criadoEm        DateTime        @default(now())
   atualizadoEm    DateTime        @updatedAt
   emitidoEm       DateTime?
@@ -99,6 +101,31 @@ enum StatusProjeto {
   EMITIDO
   VENDIDO
   CANCELADO
+}
+
+model Proposta {
+  id                 String   @id @default(cuid())
+  numero             Int      @unique
+  projeto            Projeto  @relation(fields: [projetoId], references: [id], onDelete: Cascade)
+  projetoId          String
+  contato            String?
+  cnpjCpf            String?
+  foneFax            String?
+  email              String?
+  obra               String?
+  numeroOs           String?
+  numeroPedido       String?
+  observacoes        String?
+  prazo              String
+  valorReais         Decimal  @db.Decimal(16, 2)
+  valorExtenso       String
+  condicoesPagamento String
+  linhasSnapshot     Json
+  totalSnapshot      Decimal  @db.Decimal(16, 2)
+  geradoPor          User     @relation(fields: [geradoPorId], references: [id])
+  geradoPorId        String
+  criadoEm           DateTime @default(now())
+  atualizadoEm       DateTime @updatedAt
 }
 
 model CenarioProjeto {
