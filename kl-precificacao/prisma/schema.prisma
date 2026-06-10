@@ -77,6 +77,9 @@ model Projeto {
   atualizadoEm    DateTime        @updatedAt
   emitidoEm       DateTime?
   vendidoEm       DateTime?
+  motivoCancelamento String?
+  motivoCancelNota   String?
+  canceladoEm        DateTime?
 }
 
 model Quadro {

@@ -22,7 +22,8 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { aplicarDesconto, emitirProjeto, marcarVendido, deletarProjeto } from "@/actions/projetos"
 import { formatBRL } from "@/lib/markup"
-import { MoreHorizontal, ExternalLink, Pencil, FileText, Tag, Loader2, SendHorizonal, ShoppingCart, Trash2 } from "lucide-react"
+import { MoreHorizontal, ExternalLink, Pencil, FileText, Tag, Loader2, SendHorizonal, ShoppingCart, Trash2, XCircle } from "lucide-react"
+import CancelarProjetoDialog from "./CancelarProjetoDialog"
 
 interface Props {
   id: string
@@ -37,6 +38,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
   const router = useRouter()
   const [discountOpen, setDiscountOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [cancelOpen, setCancelOpen] = useState(false)
   const [pct, setPct] = useState("")
   const [saving, setSaving] = useState(false)
   const [loadingAction, setLoadingAction] = useState<string | null>(null)
@@ -193,6 +195,16 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
           {userRole === "ADMIN" && (
             <>
               <DropdownMenuSeparator />
+              {(status === "RASCUNHO" || status === "EMITIDO") && (
+                <DropdownMenuItem
+                  onSelect={(e) => e.preventDefault()}
+                  onClick={() => setCancelOpen(true)}
+                  className="text-[#BC4A2B] focus:text-[#BC4A2B] focus:bg-surface-2"
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Cancelar projeto
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 onSelect={(e) => e.preventDefault()}
                 onClick={() => setDeleteOpen(true)}
@@ -205,6 +217,13 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <CancelarProjetoDialog
+        id={id}
+        nomeProjeto={nomeProjeto}
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
+      />
 
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent className="sm:max-w-sm">

@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button"
 import { SectionHeading } from "@/components/ui/section"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { formatBRL, formatPercent } from "@/lib/markup"
-import { cancelarProjeto, duplicarProjeto, emitirProjeto, marcarVendido } from "@/actions/projetos"
+import { duplicarProjeto, emitirProjeto, marcarVendido } from "@/actions/projetos"
 import DeleteProjetoButton from "@/components/projetos/DeleteProjetoButton"
+import CancelarProjetoDialog from "@/components/projetos/CancelarProjetoDialog"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import {
-  ArrowLeft, Copy, Trash2,
+  ArrowLeft, Copy,
   Pencil, LayoutGrid, Tag, SendHorizonal, ShoppingCart,
 } from "lucide-react"
 
@@ -136,11 +137,7 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
               </form>
             )}
             {isAdmin && projeto.status !== "CANCELADO" && (
-              <form action={async () => { "use server"; await cancelarProjeto(projeto.id) }}>
-                <Button type="submit" variant="outline" size="sm" className="h-9 gap-1.5" style={{ borderColor: "rgba(188,74,43,0.3)", color: "#BC4A2B" }}>
-                  <Trash2 className="h-3.5 w-3.5" /> Cancelar
-                </Button>
-              </form>
+              <CancelarProjetoDialog id={projeto.id} nomeProjeto={projeto.nome} withTrigger />
             )}
             {isAdmin && <DeleteProjetoButton id={projeto.id} nome={projeto.nome} />}
           </div>

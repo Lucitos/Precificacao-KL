@@ -211,11 +211,19 @@ export async function deletarProjeto(id: string) {
   return { success: true }
 }
 
-export async function cancelarProjeto(id: string) {
+export async function cancelarProjeto(id: string, motivo: string, nota?: string) {
   const session = await getSession()
   if (session?.role !== "ADMIN") return { error: "Sem permissão." }
 
-  await prisma.projeto.update({ where: { id }, data: { status: "CANCELADO" } })
+  await prisma.projeto.update({
+    where: { id },
+    data: {
+      status: "CANCELADO",
+      motivoCancelamento: motivo,
+      motivoCancelNota: nota || null,
+      canceladoEm: new Date(),
+    },
+  })
   revalidatePath("/projetos")
   revalidatePath(`/projetos/${id}`)
   return { success: true }
