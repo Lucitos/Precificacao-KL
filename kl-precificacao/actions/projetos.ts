@@ -257,6 +257,15 @@ export async function atualizarProjeto(
     }
   }
 
+  await registrarLog({
+    acao: emitir ? "PROJETO_EMITIDO" : "PROJETO_EDITADO",
+    entidade: "Projeto",
+    entidadeId: id,
+    descricao: emitir
+      ? `Projeto ${projeto.numeroReferencia} — ${nome} editado e emitido`
+      : `Projeto ${projeto.numeroReferencia} — ${nome} editado`,
+  })
+
   revalidatePath("/projetos")
   revalidatePath(`/projetos/${id}`)
   revalidatePath("/")
@@ -301,6 +310,15 @@ export async function cancelarProjeto(id: string, motivo: string, nota?: string)
       canceladoEm: new Date(),
     },
   })
+
+  await registrarLog({
+    acao: "PROJETO_CANCELADO",
+    entidade: "Projeto",
+    entidadeId: id,
+    descricao: `Projeto cancelado — motivo: ${motivo}${nota ? ` (${nota})` : ""}`,
+    metadata: { motivo, nota: nota || null },
+  })
+
   revalidatePath("/projetos")
   revalidatePath(`/projetos/${id}`)
   return { success: true }

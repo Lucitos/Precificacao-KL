@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   DropdownMenu,
@@ -43,11 +43,10 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
   const [saving, setSaving] = useState(false)
   const [loadingAction, setLoadingAction] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (discountOpen) {
-      setPct(desconto !== null ? String(desconto) : "")
-    }
-  }, [discountOpen, desconto])
+  const abrirDesconto = () => {
+    setPct(desconto !== null ? String(desconto) : "")
+    setDiscountOpen(true)
+  }
 
   const precoBase = Number(precoVenda)
   const pctNum = pct !== "" ? Number(pct) : null
@@ -180,7 +179,7 @@ export default function ProjetoActionsDropdown({ id, status, precoVenda, descont
 
           <DropdownMenuItem
             onSelect={(e) => e.preventDefault()}
-            onClick={() => setDiscountOpen(true)}
+            onClick={abrirDesconto}
             className="text-ink-soft"
           >
             <Tag className="w-4 h-4 mr-2" />
