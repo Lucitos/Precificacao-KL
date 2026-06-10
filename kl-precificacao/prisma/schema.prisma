@@ -73,6 +73,7 @@ model Projeto {
   responsavelId    String
   itens            ItemOrcamento[]
   quadros          Quadro[]
+  cenarios         CenarioProjeto[]
   criadoEm        DateTime        @default(now())
   atualizadoEm    DateTime        @updatedAt
   emitidoEm       DateTime?
@@ -98,6 +99,20 @@ enum StatusProjeto {
   EMITIDO
   VENDIDO
   CANCELADO
+}
+
+model CenarioProjeto {
+  id               String   @id @default(cuid())
+  projeto          Projeto  @relation(fields: [projetoId], references: [id], onDelete: Cascade)
+  projetoId        String
+  nome             String
+  margemAplicada   Decimal  @db.Decimal(6, 4)
+  markupAplicado   Decimal  @db.Decimal(12, 8)
+  custoDiretoTotal Decimal  @db.Decimal(16, 2)
+  precoVendaTotal  Decimal  @db.Decimal(16, 2)
+  vi               Decimal  @db.Decimal(8, 4)
+  criadoPorId      String?
+  criadoEm         DateTime @default(now())
 }
 
 model ItemOrcamento {

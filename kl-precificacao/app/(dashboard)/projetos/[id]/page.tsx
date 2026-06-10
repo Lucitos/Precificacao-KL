@@ -9,6 +9,8 @@ import { formatBRL, formatPercent } from "@/lib/markup"
 import { duplicarProjeto, emitirProjeto, marcarVendido } from "@/actions/projetos"
 import DeleteProjetoButton from "@/components/projetos/DeleteProjetoButton"
 import CancelarProjetoDialog from "@/components/projetos/CancelarProjetoDialog"
+import { CenariosProjeto } from "@/components/projetos/CenariosProjeto"
+import { listarCenarios } from "@/actions/cenarios"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import {
@@ -78,6 +80,8 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
   })
 
   if (!projeto) notFound()
+
+  const cenarios = await listarCenarios(projeto.id)
 
   const snap = projeto.dreSnapshot as {
     exercicio: string
@@ -231,6 +235,19 @@ export default async function ProjetoDetalhe({ params }: { params: Promise<{ id:
                 </table>
               </div>
             )}
+
+          <div className="mt-8">
+            <CenariosProjeto
+              projetoId={projeto.id}
+              atual={{
+                margemAplicada: projeto.margemAplicada.toString(),
+                markupAplicado: projeto.markupAplicado.toString(),
+                precoVendaTotal: projeto.precoVendaTotal.toString(),
+                vi: projeto.vi.toString(),
+              }}
+              cenariosIniciais={cenarios}
+            />
+          </div>
         </div>
 
         {/* Coluna lateral */}
