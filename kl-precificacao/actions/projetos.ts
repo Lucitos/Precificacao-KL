@@ -14,12 +14,14 @@ type ItemIncluded = {
 }
 
 export interface ItemInput {
+  id?: string
   componenteId: string
   quantidade: number
   precoCustoUnitario: number
 }
 
 export interface QuadroInput {
+  id?: string
   nome: string
   quantidade: number
   ordem: number
@@ -142,9 +144,6 @@ export async function atualizarProjeto(
     faturamentoEstimado: dre.faturamentoEstimado?.toString() ?? null,
   }
 
-  await prisma.itemOrcamento.deleteMany({ where: { projetoId: id } })
-  await prisma.quadro.deleteMany({ where: { projetoId: id } })
-
   await prisma.projeto.update({
     where: { id },
     data: {
@@ -162,21 +161,98 @@ export async function atualizarProjeto(
     },
   })
 
+  // Incremental diff: preserve ids/history for untouched quadros and itens.
+  const existentes = await prisma.quadro.findMany({
+    where: { projetoId: id },
+    include: { itens: true },
+  })
+  const existentesPorId = new Map(existentes.map((q) => [q.id, q]))
+
+  // Quadros and itens present in the input (carry a real DB id).
+  const quadroIdsInput = new Set(quadros.filter((q) => q.id).map((q) => q.id!))
+
+  // 1. Delete itens that were removed (do this before deleting quadros — the
+  //    quadro→item relation is onDelete: SetNull, so orphaned itens would remain).
+  for (const existente of existentes) {
+    const quadroMantido = quadroIdsInput.has(existente.id)
+    const itemIdsInput = quadroMantido
+      ? new Set(
+          quadros
+            .find((q) => q.id === existente.id)!
+            .itens.filter((i) => i.id)
+            .map((i) => i.id!)
+        )
+      : new Set<string>()
+    for (const item of existente.itens) {
+      // Delete itens removed from a kept quadro, or all itens of a removed quadro.
+      if (!quadroMantido || !itemIdsInput.has(item.id)) {
+        await prisma.itemOrcamento.delete({ where: { id: item.id } })
+      }
+    }
+  }
+
+  // 2. Delete quadros that were removed.
+  for (const existente of existentes) {
+    if (!quadroIdsInput.has(existente.id)) {
+      await prisma.quadro.delete({ where: { id: existente.id } })
+    }
+  }
+
+  // 2b. Remove legacy quadro-less itens (older projects stored itens with
+  //     quadroId: null; the editor re-creates them attached to a quadro).
+  await prisma.itemOrcamento.deleteMany({ where: { projetoId: id, quadroId: null } })
+
+  // 3. Update existing quadros / create new ones; then diff their itens.
   for (const q of quadros) {
-    const quadro = await prisma.quadro.create({
-      data: { projetoId: id, nome: q.nome, quantidade: q.quantidade, ordem: q.ordem },
-    })
-    for (const item of q.itens) {
-      await prisma.itemOrcamento.create({
-        data: {
-          projetoId: id,
-          quadroId: quadro.id,
-          componenteId: item.componenteId,
-          quantidade: item.quantidade.toString(),
-          precoCustoUnitario: item.precoCustoUnitario.toString(),
-          precoCustoTotal: (item.quantidade * item.precoCustoUnitario).toFixed(2),
-        },
+    let quadroId: string
+    if (q.id && existentesPorId.has(q.id)) {
+      await prisma.quadro.update({
+        where: { id: q.id },
+        data: { nome: q.nome, quantidade: q.quantidade, ordem: q.ordem },
       })
+      quadroId = q.id
+    } else {
+      const novo = await prisma.quadro.create({
+        data: { projetoId: id, nome: q.nome, quantidade: q.quantidade, ordem: q.ordem },
+      })
+      quadroId = novo.id
+    }
+
+    const itensExistentes = existentesPorId.get(quadroId)?.itens ?? []
+    const itensExistentesPorId = new Map(itensExistentes.map((i) => [i.id, i]))
+
+    for (const item of q.itens) {
+      const total = (item.quantidade * item.precoCustoUnitario).toFixed(2)
+      const existenteItem = item.id ? itensExistentesPorId.get(item.id) : undefined
+      if (existenteItem) {
+        const mudou =
+          Number(existenteItem.quantidade) !== item.quantidade ||
+          Number(existenteItem.precoCustoUnitario) !== item.precoCustoUnitario ||
+          Number(existenteItem.precoCustoTotal) !== Number(total) ||
+          existenteItem.componenteId !== item.componenteId
+        if (mudou) {
+          await prisma.itemOrcamento.update({
+            where: { id: existenteItem.id },
+            data: {
+              componenteId: item.componenteId,
+              quantidade: item.quantidade.toString(),
+              precoCustoUnitario: item.precoCustoUnitario.toString(),
+              precoCustoTotal: total,
+            },
+          })
+        }
+      } else {
+        await prisma.itemOrcamento.create({
+          data: {
+            projetoId: id,
+            quadroId,
+            componenteId: item.componenteId,
+            quantidade: item.quantidade.toString(),
+            precoCustoUnitario: item.precoCustoUnitario.toString(),
+            precoCustoTotal: total,
+          },
+        })
+      }
     }
   }
 

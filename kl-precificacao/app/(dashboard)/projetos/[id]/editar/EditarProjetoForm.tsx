@@ -29,6 +29,7 @@ interface Componente {
 
 export interface ItemLista {
   localId: string
+  dbId?: string
   quadroLocalId: string
   componenteId: string
   codigoFabricante: string
@@ -41,6 +42,7 @@ export interface ItemLista {
 
 export interface QuadroLocal {
   localId: string
+  dbId?: string
   nome: string
   quantidade: number
   quantidadeStr: string
@@ -221,12 +223,14 @@ export default function EditarProjetoForm({
     setLoading(true)
     try {
       const quadrosInput: QuadroInput[] = quadros.map((q, idx) => ({
+        id: q.dbId,
         nome: q.nome.trim() || `Quadro ${idx + 1}`,
         quantidade: q.quantidade,
         ordem: idx,
         itens: itens
           .filter((i) => i.quadroLocalId === q.localId)
           .map((i) => ({
+            id: i.dbId,
             componenteId: i.componenteId,
             quantidade: i.quantidade,
             precoCustoUnitario: i.precoCustoUnitario,

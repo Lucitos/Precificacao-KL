@@ -33,6 +33,7 @@ export default async function EditarProjetoPage({ params }: { params: Promise<{ 
   if (projeto.quadros.length > 0) {
     initialQuadros = projeto.quadros.map((q) => ({
       localId: q.id,
+      dbId: q.id,
       nome: q.nome,
       quantidade: q.quantidade,
       quantidadeStr: String(q.quantidade),
@@ -41,6 +42,7 @@ export default async function EditarProjetoPage({ params }: { params: Promise<{ 
     initialItens = projeto.quadros.flatMap((q) =>
       q.itens.map((item) => ({
         localId: item.id,
+        dbId: item.id,
         quadroLocalId: q.id,
         componenteId: item.componenteId,
         codigoFabricante: item.componente.codigoFabricante,
@@ -52,6 +54,9 @@ export default async function EditarProjetoPage({ params }: { params: Promise<{ 
       }))
     )
   } else {
+    // Legacy projects without quadros: items are quadro-less (quadroId: null).
+    // Treat them as new under a fresh default quadro (no dbId) so the diff
+    // recreates them attached to the quadro; the action cleans up the orphans.
     const defaultId = "default-quadro"
     initialQuadros = [{ localId: defaultId, nome: "Geral", quantidade: 1, quantidadeStr: "1", busca: "" }]
     initialItens = projeto.itens.map((item) => ({
