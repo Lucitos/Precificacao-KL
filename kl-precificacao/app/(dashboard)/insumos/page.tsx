@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header"
 import { Button } from "@/components/ui/button"
 import { formatBRL } from "@/lib/markup"
 import { AtualizarPrecoDialog } from "@/components/insumos/AtualizarPrecoDialog"
+import { HistoricoReajusteDialog } from "@/components/insumos/HistoricoReajusteDialog"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Plus, Package, ChevronLeft, ChevronRight } from "lucide-react"
@@ -144,8 +145,8 @@ export default async function InsumosPage({
                   <th className="py-2.5 pl-0 pr-3 text-left text-[11px] font-medium text-muted-fg">Código / Descrição</th>
                   <th className="px-3 py-2.5 text-left text-[11px] font-medium text-muted-fg">Fabricante</th>
                   <th className="px-3 py-2.5 text-left text-[11px] font-medium text-muted-fg">Categoria</th>
-                  <th className={cn("px-3 py-2.5 text-right text-[11px] font-medium text-muted-fg", !isAdmin && "pr-0")}>Preço de custo</th>
-                  {isAdmin && <th className="py-2.5 pl-3 pr-0 text-center text-[11px] font-medium text-muted-fg">Ações</th>}
+                  <th className="px-3 py-2.5 text-right text-[11px] font-medium text-muted-fg">Preço de custo</th>
+                  <th className="py-2.5 pl-3 pr-0 text-center text-[11px] font-medium text-muted-fg">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -167,18 +168,24 @@ export default async function InsumosPage({
                         <span className="text-[12px] text-muted-fg">—</span>
                       )}
                     </td>
-                    <td className={cn("num px-3 py-3 text-right text-[13px] font-medium text-ink", !isAdmin && "pr-0")}>
+                    <td className="num px-3 py-3 text-right text-[13px] font-medium text-ink">
                       {c.precos[0] ? formatBRL(c.precos[0].precoCusto.toString()) : "—"}
                     </td>
-                    {isAdmin && (
-                      <td className="py-3 pl-3 pr-0 text-center">
-                        <AtualizarPrecoDialog
+                    <td className="py-3 pl-3 pr-0">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <HistoricoReajusteDialog
                           componenteId={c.id}
                           descricao={c.descricao}
-                          precoAtual={c.precos[0]?.precoCusto?.toString() ?? "0"}
                         />
-                      </td>
-                    )}
+                        {isAdmin && (
+                          <AtualizarPrecoDialog
+                            componenteId={c.id}
+                            descricao={c.descricao}
+                            precoAtual={c.precos[0]?.precoCusto?.toString() ?? "0"}
+                          />
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
